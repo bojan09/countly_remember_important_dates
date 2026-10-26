@@ -287,6 +287,12 @@ async function boot() {
   });
   onPrefChange(() => {});
   await initStore();
+  // Ask the browser not to evict our data under disk pressure (it may decline silently).
+  try {
+    navigator.storage?.persist?.().catch(() => {});
+  } catch {
+    /* unavailable */
+  }
   // Live updates: a save in this tab or another tab refreshes the visible list. Forms are left alone.
   onStoreChange(() => {
     if (current.name === 'new' || current.name === 'edit') return;

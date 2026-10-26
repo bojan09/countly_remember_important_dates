@@ -33,6 +33,7 @@ export const DEFAULT_PREFS = Object.freeze({
   showSamples: true,
   onboarded: false,
   sidebarCollapsed: false,
+  lastBackup: null, // epoch ms of the last exported backup
 });
 
 let prefs = { ...DEFAULT_PREFS };
@@ -49,7 +50,7 @@ function read() {
   }
 }
 
-function sanitize(input) {
+export function sanitizePrefs(input) {
   const out = { ...DEFAULT_PREFS };
   if (input.lang === 'en' || input.lang === 'mk') out.lang = input.lang;
   if (['light', 'dark', 'auto'].includes(input.theme)) out.theme = input.theme;
@@ -60,11 +61,12 @@ function sanitize(input) {
     if (typeof input[k] === 'boolean') out[k] = input[k];
   }
   if (typeof input.name === 'string') out.name = input.name.slice(0, 40);
+  if (Number.isFinite(input.lastBackup) && input.lastBackup > 0) out.lastBackup = input.lastBackup;
   return out;
 }
 
 export function loadPrefs() {
-  prefs = sanitize(read());
+  prefs = sanitizePrefs(read());
   return prefs;
 }
 
@@ -74,7 +76,7 @@ export function getPrefs() {
 
 export function setPref(key, value) {
   if (!Object.hasOwn(DEFAULT_PREFS, key)) return;
-  prefs = sanitize({ ...prefs, [key]: value });
+  prefs = sanitizePrefs({ ...prefs, [key]: value });
   try {
     localStorage.setItem(KEY, JSON.stringify(prefs));
   } catch {

@@ -307,9 +307,10 @@ test('first-run onboarding appears once and can be completed', { skip }, async (
   await page.goto(ctx.base + '/', { waitUntil: 'networkidle0' });
   await page.waitForSelector('dialog.onboarding[open]');
   await page.click('dialog .ob-chip[lang="mk"]');
-  await page.waitForFunction(() => document.documentElement.lang === 'mk' && document.querySelector('dialog.onboarding[open]'));
+  // switching language closes and reopens the dialog asynchronously: wait for the reopened one
+  await page.waitForFunction(() => document.documentElement.lang === 'mk' && document.querySelector('dialog.onboarding[open] .ob-chip[lang="mk"][aria-checked="true"]'));
   await page.click('dialog .modal-foot .btn');
-  await page.waitForFunction(() => !document.querySelector('dialog[open]'));
+  await page.waitForFunction(() => !document.querySelector('dialog[open]') && JSON.parse(localStorage.getItem('countly.prefs.v1')).onboarded === true);
   assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('countly.prefs.v1')).onboarded), true);
   await page.reload({ waitUntil: 'networkidle0' });
   assert.equal(await page.$('dialog[open]'), null, 'no onboarding on second visit');

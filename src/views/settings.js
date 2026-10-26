@@ -2,14 +2,10 @@ import { h, openModal } from '../components/ui.js';
 import { icon, flagSvg } from '../components/icons.js';
 import { pageHeader, mobilePageHead } from '../components/chrome.js';
 import { ACCENTS } from '../store/prefs.js';
-import { LANGS, t, getLang } from '../i18n/index.js';
+import { LANGS, t, getLang, formatDate } from '../i18n/index.js';
+import { runExport, pickAndImport } from './backupFlow.js';
 
-const SOON_ROWS = [
-  ['notifications', 'bell'],
-  ['backup', 'refresh'],
-  ['exportData', 'upload'],
-  ['importData', 'download'],
-];
+const SOON_ROWS = [['notifications', 'bell']];
 
 function formatBytes(n) {
   if (n < 1024) return `${n} B`;
@@ -89,7 +85,11 @@ export default function renderSettings(ctx) {
   for (const [key, ic] of SOON_ROWS) {
     list.append(h('li', null, h('div', { class: 'row disabled', 'aria-disabled': 'true' }, h('span', { class: 'row-ico', html: icon(ic, { size: 22 }) }), h('span', { class: 'grow' }, t(`settings.${key}`)), h('span', { class: 'soon' }, t('settings.soon')))));
   }
+  const last = prefs.lastBackup ? t('backup.last', { date: formatDate(new Date(prefs.lastBackup).toISOString().slice(0, 10)) }) : t('backup.never');
+  const dataRow = (ic, label, sub, onclick) => h('li', null, h('button', { type: 'button', class: 'row', onclick }, h('span', { class: 'row-ico', html: icon(ic, { size: 22 }) }), h('span', { class: 'grow' }, h('span', { class: 'row-title' }, label), sub ? h('small', { class: 'row-sub muted' }, sub) : null), h('span', { html: icon('chevronRight', { size: 20 }) })));
   list.append(
+    dataRow('upload', t('settings.exportData'), last, () => runExport(ctx)),
+    dataRow('download', t('settings.importData'), t('backup.importHelp'), () => pickAndImport(ctx)),
     h('li', null, h('button', { type: 'button', class: 'row', onclick: () => showPwa(ctx) }, h('span', { class: 'row-ico', html: icon('wifiOff', { size: 22 }) }), h('span', { class: 'grow' }, t('settings.pwa')), h('span', { html: icon('chevronRight', { size: 20 }) }))),
     h('li', null, h('button', { type: 'button', class: 'row', onclick: () => showAbout() }, h('span', { class: 'row-ico', html: icon('info', { size: 22 }) }), h('span', { class: 'grow' }, t('settings.about')), h('span', { html: icon('chevronRight', { size: 20 }) }))),
   );
@@ -125,6 +125,13 @@ async function showPwa(ctx) {
     /* estimate unavailable */
   }
   add(t('pwa.storage'), storage);
+  let protectedStore = null;
+  try {
+    if (navigator.storage && navigator.storage.persisted) protectedStore = await navigator.storage.persisted();
+  } catch {
+    /* unavailable */
+  }
+  if (protectedStore !== null) add(t('pwa.protected'), protectedStore ? t('pwa.protectedYes') : t('pwa.protectedNo'));
   const actions = [];
   if (pwa.canInstall()) actions.push({ label: t('actions.install'), onClick: async (close) => { await pwa.install(); close(); } });
   if (pwa.updateAvailable()) actions.push({ label: t('pwa.reload'), onClick: () => pwa.applyUpdate() });

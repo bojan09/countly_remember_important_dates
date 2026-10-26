@@ -1,6 +1,6 @@
 // Countly service worker: precaches the app shell for offline use.
 // Bump VERSION whenever any precached file changes (tests/sw.test.js verifies the list is complete).
-const VERSION = 'countly-shell-v5';
+const VERSION = 'countly-shell-v6';
 
 const SHELL = [
   './',
@@ -38,6 +38,7 @@ const SHELL = [
   './src/i18n/mk-dates.js',
   './src/i18n/mk.js',
   './src/scenes/art.js',
+  './src/store/backup.js',
   './src/store/db.js',
   './src/store/demo.js',
   './src/store/events.js',
@@ -48,6 +49,7 @@ const SHELL = [
   './src/styles/layout.css',
   './src/styles/tokens.css',
   './src/styles/views.css',
+  './src/views/backupFlow.js',
   './src/views/calendar.js',
   './src/views/categories.js',
   './src/views/create.js',

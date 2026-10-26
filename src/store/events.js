@@ -12,6 +12,7 @@ import { openStorage } from './db.js';
 import { migrateRecord, validateEvent, newId, SCHEMA } from '../events/model.js';
 import { nextActive, prevActive, isRecurring, normalizeRule, nextOccurrence, occurrencesBetween } from '../date/recurrence.js';
 import { t } from '../i18n/index.js';
+import { buildBackup, planImport } from './backup.js';
 
 export const PHOTO_LIMITS = { maxBytes: 8 * 1024 * 1024, maxPerEvent: 12 };
 
@@ -351,4 +352,38 @@ export async function removePhoto(eventId, id) {
   await storage.delete('photos', id);
   photoMeta.set(eventId, listPhotos(eventId).filter((p) => p.id !== id));
   bump();
+}
+
+/* ---------- backup / restore ---------- */
+/** Serialize every user event, photo and the backup-worthy preferences into backup JSON text. */
+export async function exportBackup(prefs) {
+  const photos = await storage.getAll('photos');
+  const backup = await buildBackup({ records: [...series.values()], photos, prefs });
+  return { text: JSON.stringify(backup), events: backup.events.length, photos: backup.photos.length };
+}
+
+const photoIdsByEvent = () => new Map([...photoMeta].map(([k, v]) => [k, v.map((p) => p.id)]));
+
+/** What importing `parsed` (from parseBackup) would change, without touching storage. */
+export const previewImport = (parsed, mode) => planImport(parsed, series, photoIdsByEvent(), mode, PHOTO_LIMITS);
+
+/**
+ * Apply an import. Writes the new data first and only then removes what a replace drops, so a
+ * failure part-way never leaves the store emptier than it started. Returns the plan counts.
+ */
+export async function importBackup(parsed, mode = 'merge') {
+  const plan = previewImport(parsed, mode);
+  await storage.putMany('events', [...plan.add, ...plan.update]);
+  if (plan.photos.length) {
+    await storage.putMany('photos', plan.photos.map(({ bytes, ...p }) => ({ ...p, blob: new Blob([bytes], { type: p.type }) })));
+  }
+  if (mode === 'replace') {
+    const keep = new Set(parsed.events.map((e) => e.id));
+    const keepPhotos = new Set(parsed.photos.map((p) => p.id));
+    for (const id of plan.remove) await storage.delete('events', id);
+    for (const p of await storage.getAll('photos')) if (!keepPhotos.has(p.id) || !keep.has(p.eventId)) await storage.delete('photos', p.id);
+  }
+  await loadAll();
+  bump();
+  return { added: plan.add.length, updated: plan.update.length, unchanged: plan.unchanged, photos: plan.photos.length, removed: plan.remove.length };
 }

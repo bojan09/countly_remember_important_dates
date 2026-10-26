@@ -11,7 +11,7 @@ Only partly, and always with a manual or peer-to-peer step:
 
 | Option | Needs a server? | Real-time? | Verdict |
 |---|---|---|---|
-| **Export / import a backup file** (JSON, optionally with photos) | No | No | Planned for Phase 5. Simple, private, works everywhere. Good as the safety net regardless of anything else. |
+| **Export / import a backup file** (JSON, optionally with photos) | No | No | Built in Phase 4.1. Simple, private, works everywhere. Good as the safety net regardless of anything else. |
 | **Share via link or QR code** (event encoded in the URL / QR) | No | No | Good for sending one event or one countdown to someone, not for keeping devices in sync. |
 | **Peer-to-peer sync (WebRTC)** | A tiny signalling step (QR/code) to pair; no data stored on a server | Only while both devices are online | Possible, but fiddly (pairing, NAT/firewalls, conflict handling). Not worth it for v1. |
 | **Cloud-drive file sync** (File System Access API / user's own Drive/Dropbox) | The user's own storage | Eventually | Browser support is uneven (iOS Safari has none). |

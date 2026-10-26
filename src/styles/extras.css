@@ -1196,3 +1196,62 @@ a:hover .heat-cell {
 ::view-transition-new(root) {
   animation-duration: 120ms;
 }
+
+/* Backup / import dialog */
+.bk-modes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.bk-opt {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  cursor: pointer;
+}
+
+.bk-opt.inline {
+  border: 0;
+  padding: 4px 0;
+  margin-top: 8px;
+}
+
+.bk-opt input {
+  margin-top: 3px;
+  accent-color: var(--accent);
+}
+
+.bk-opt span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bk-opt:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.bk-plan {
+  margin: 8px 0 12px;
+  font-weight: 600;
+}
+
+.row-title {
+  display: block;
+}
+
+.row-sub {
+  display: block;
+  font-weight: 400;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

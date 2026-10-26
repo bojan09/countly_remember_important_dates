@@ -1,5 +1,11 @@
 # Changelog
 
+## Phase 4.1 — Backup, import and export (0.4.0)
+- Export all events, photos and key preferences to a versioned JSON file; last-backup date in Settings.
+- Import with preview, merge (newer wins, never deletes) or replace (typed confirmation + automatic safety backup).
+- Imported files are strictly validated (size, version, events, photo type/size/ownership, preferences).
+- Requests persistent browser storage and shows its status. Service worker cache v6.
+
 ## Phase 3 — Living scenes and richer analytics (0.3.0)
 - Rolling countdown digits, one-time count-up of day totals and a confetti burst on the event day; all respect full / calm / off motion and system reduced motion.
 - Two new animated scenes (deadline, holiday) and matching sample events.
