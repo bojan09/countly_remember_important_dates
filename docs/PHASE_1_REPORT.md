@@ -19,4 +19,4 @@ See [DESIGN_FIDELITY.md](DESIGN_FIDELITY.md) and [screenshots/](screenshots/). S
 Real devices, screen readers, install prompt UI, performance budgets, native-speaker Macedonian review.
 
 ## Git
-Commit and push status are recorded in the final message of this phase.
+Commit `a2f1ca9` pushed to `origin/master` (https://github.com/bojan09/countly_remember_important_dates). Single branch `master`, no PRs.
