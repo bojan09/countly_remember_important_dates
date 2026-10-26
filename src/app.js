@@ -2,7 +2,7 @@ import { loadPrefs, getPrefs, setPref as storeSetPref, applyPrefs, onPrefChange 
 import { setLang, getLang, t, LANGS } from './i18n/index.js';
 import { todayISO } from './date/calendar.js';
 import { tickLive } from './components/eventCard.js';
-import { getEvents, getEvent } from './store/events.js';
+import { getEvents, getEvent, initStore, onStoreChange, storeStatus } from './store/events.js';
 import { h, openModal, toast } from './components/ui.js';
 import { icon, flagSvg } from './components/icons.js';
 import { logoMark } from './components/logo.js';
@@ -17,6 +17,7 @@ const ROUTES = {
   memories: { name: 'memories', load: () => import('./views/memories.js'), title: 'nav.memories' },
   settings: { name: 'settings', load: () => import('./views/settings.js'), title: 'nav.settings' },
   new: { name: 'new', load: () => import('./views/create.js'), title: 'create.title' },
+  edit: { name: 'edit', load: () => import('./views/create.js'), title: 'create.editTitle' },
   event: { name: 'event', load: () => import('./views/detail.js'), title: 'nav.home' },
 };
 
@@ -148,7 +149,7 @@ function markActive() {
   if (shell) shell.dataset.route = current.name;
   document.querySelectorAll('[data-route]').forEach((a) => {
     if (a.classList.contains('shell')) return;
-    const on = a.dataset.route === current.name || (current.name === 'event' && a.dataset.route === 'home') || (['timeline', 'categories', 'memories', 'settings'].includes(current.name) && a.dataset.route === 'more');
+    const on = a.dataset.route === current.name || (['event', 'edit', 'new'].includes(current.name) && a.dataset.route === 'home') || (['timeline', 'categories', 'memories', 'settings'].includes(current.name) && a.dataset.route === 'more');
     if (on) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   });
@@ -295,13 +296,14 @@ function checkDayChange() {
   }
 }
 setInterval(() => {
+  if (document.hidden) return;
   checkDayChange();
   tickLive();
-}, 15000);
+}, 1000);
 window.addEventListener('focus', checkDayChange);
 
 /* ---------- boot ---------- */
-function boot() {
+async function boot() {
   const prefs = loadPrefs();
   setLang(prefs.lang, { silent: true });
   applyPrefs();
@@ -312,6 +314,12 @@ function boot() {
     }
   });
   onPrefChange(() => {});
+  await initStore();
+  // Live updates: a save in this tab or another tab refreshes the visible list. Forms are left alone.
+  onStoreChange(() => {
+    if (current.name === 'new' || current.name === 'edit') return;
+    renderRoute({ keepScroll: true });
+  });
   mountShell();
   window.addEventListener('hashchange', () => {
     enteredViaApp = true;
@@ -320,6 +328,8 @@ function boot() {
   renderRoute();
   initPwa();
   if (!prefs.onboarded) showOnboarding();
+  if (!storeStatus.persistent) toast(t('toast.storageMemory'), { timeout: 8000 });
+  if (storeStatus.skipped) toast(t('toast.loadSkipped', { count: storeStatus.skipped }), { timeout: 6000 });
 }
 
 boot();

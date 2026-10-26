@@ -382,7 +382,7 @@ test('text contrast meets WCAG AA in both themes on core screens', { skip, timeo
   const problems = [];
   for (const theme of ['dark', 'light']) {
     for (const [vk, viewport] of [['mobile-390', VIEWPORTS['mobile-390']], ['desktop-1440', VIEWPORTS['desktop-1440']]]) {
-      for (const route of ['#/', '#/calendar', '#/timeline', '#/stats', '#/categories', '#/memories', '#/settings', '#/event/sample-birthday']) {
+      for (const route of ['#/', '#/calendar', '#/timeline', '#/stats', '#/categories', '#/memories', '#/settings', '#/new', '#/event/sample-birthday']) {
         const page = await openPage(ctx, { viewport, route, prefs: { theme }, colorScheme: theme });
         for (const f of await contrastFailures(page)) problems.push(`${theme} ${vk} ${route}: ${f}`);
         await page.close();

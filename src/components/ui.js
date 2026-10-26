@@ -112,18 +112,39 @@ export function openModal({ title, content, actions = [], variant = '', onClose 
 }
 
 let toastHost;
-export function toast(message, { timeout = 3200 } = {}) {
+export function toast(message, { timeout = 3200, action = null } = {}) {
   if (!toastHost) {
     toastHost = h('div', { class: 'toast-host', role: 'status', 'aria-live': 'polite' });
     document.body.append(toastHost);
   }
-  const node = h('div', { class: 'toast' }, message);
+  const node = h('div', { class: 'toast' }, h('span', null, message));
   toastHost.append(node);
   const remove = () => node.remove();
-  setTimeout(() => {
+  const dismiss = () => {
     node.classList.add('out');
     setTimeout(remove, 260);
-  }, timeout);
+  };
+  if (action) {
+    node.append(h('button', { type: 'button', class: 'toast-action', onclick: () => { dismiss(); action.onClick(); } }, action.label));
+  }
+  setTimeout(dismiss, action ? Math.max(timeout, 7000) : timeout);
+}
+
+/** Accessible confirmation dialog. Resolves true on confirm, false on cancel/Esc. */
+export function confirmDialog({ title, body, confirmLabel, danger = false }) {
+  return new Promise((resolve) => {
+    let answer = false;
+    openModal({
+      title,
+      content: h('p', { class: 'confirm-body' }, body),
+      variant: 'confirm',
+      actions: [
+        { label: t('actions.cancel'), variant: 'secondary' },
+        { label: confirmLabel, variant: danger ? 'danger' : 'primary', onClick: (close) => { answer = true; close(); } },
+      ],
+      onClose: () => resolve(answer),
+    });
+  });
 }
 
 export function emptyState({ iconName = 'sparkle', title, body, action }) {

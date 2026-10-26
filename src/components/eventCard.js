@@ -1,7 +1,8 @@
 import { h } from './ui.js';
 import { icon } from './icons.js';
 import { sceneSvg } from '../scenes/art.js';
-import { countdown, progress, timeLeft } from '../date/calendar.js';
+import { countdown, progress } from '../date/calendar.js';
+import { eventInstantMs, splitDuration } from '../date/instant.js';
 import { t, unit, formatDays, formatNumber, formatDate } from '../i18n/index.js';
 import { eventTitle } from '../store/demo.js';
 
@@ -19,24 +20,35 @@ export function daysLabel(ev, today) {
   return '';
 }
 
-/** Live "3d 14h 22m" line; refreshed by tickLive() so it counts down while the app is open. */
-export function liveCountdown(ev, cls = 'live-left') {
-  const node = h('div', { class: cls, 'data-live-date': ev.date });
+/**
+ * Live "3d 14h 22m" line (add seconds with { seconds: true }). Targets the event's real start
+ * instant (all-day = local midnight, timed = its clock time or absolute zone time) and is
+ * repainted every second by tickLive(), so it stays right across sleep, reload and midnight.
+ */
+export function liveCountdown(ev, cls = 'live-left', { seconds = false } = {}) {
+  const node = h('div', { class: cls, 'data-live-ts': String(eventInstantMs(ev, ev.date)), 'data-live-sec': seconds ? '1' : '0', role: 'timer' });
   paintLive(node);
   return node;
 }
 
 function paintLive(node) {
-  const tl = timeLeft(node.getAttribute('data-live-date'));
-  node.hidden = !tl;
-  if (!tl) return;
-  const v = { d: formatNumber(tl.d), h: tl.h, m: tl.m };
-  node.textContent = t('rel.timeLeft', v);
-  node.setAttribute('aria-label', t('rel.timeLeftLabel', v));
+  const ts = Number(node.getAttribute('data-live-ts'));
+  const ms = ts - Date.now();
+  node.hidden = !(ms > 0);
+  if (!(ms > 0)) return;
+  const v = splitDuration(ms);
+  const params = { d: formatNumber(v.d), h: v.h, m: v.m, s: v.s };
+  const withSec = node.getAttribute('data-live-sec') === '1';
+  node.textContent = t(withSec ? 'rel.timeLeftSec' : 'rel.timeLeft', params);
+  const minuteKey = `${v.d}.${v.h}.${v.m}`;
+  if (node.dataset.minuteKey !== minuteKey) {
+    node.dataset.minuteKey = minuteKey; // screen readers get a fresh label once a minute, not every second
+    node.setAttribute('aria-label', t('rel.timeLeftLabel', params));
+  }
 }
 
 export function tickLive() {
-  document.querySelectorAll('[data-live-date]').forEach(paintLive);
+  document.querySelectorAll('[data-live-ts]').forEach(paintLive);
 }
 
 /** variant: 'wide' (mobile gallery) | 'tile' (desktop row) */
@@ -65,7 +77,7 @@ export function eventCard(ev, today, { variant = 'wide' } = {}) {
     h(
       'div',
       { class: 'ecard-body' },
-      h('div', { class: 'ecard-title' }, h('span', null, title), ev.emoji ? h('span', { 'aria-hidden': 'true' }, ev.emoji) : null),
+      h('div', { class: 'ecard-title' }, h('span', null, title), ev.emoji ? h('span', { 'aria-hidden': 'true' }, ev.emoji) : null, ev.pinned ? h('span', { class: 'ecard-pin', title: t('form.pinned'), html: icon('star', { size: 14 }) }) : null),
       h('div', { class: 'ecard-days' }, daysLabel(ev, today)),
       h('div', { class: 'ecard-date' }, formatDate(ev.date)),
       liveCountdown(ev),

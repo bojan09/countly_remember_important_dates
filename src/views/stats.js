@@ -1,7 +1,7 @@
 import { h, segmented, emptyState } from '../components/ui.js';
 import { icon } from '../components/icons.js';
 import { pageHeader, mobilePageHead } from '../components/chrome.js';
-import { countByCategory, countByMonth, upcoming, past } from '../events/select.js';
+import { countByCategory, countByMonth, upcoming, past, uniqueSeries } from '../events/select.js';
 import { CATEGORIES, categoryById } from '../events/categories.js';
 import { parseISODate } from '../date/calendar.js';
 import { t, formatNumber, monthShort } from '../i18n/index.js';
@@ -37,7 +37,7 @@ function donut(segments, total) {
 export default function renderStats(ctx) {
   const { today, events } = ctx;
   const year = parseISODate(today).y;
-  const total = events.length;
+  const total = uniqueSeries(events).length;
   const counts = countByCategory(events);
   const segments = CATEGORIES.filter((c) => counts.get(c.id)).map((c) => ({ id: c.id, color: c.color, count: counts.get(c.id) }));
   const months = countByMonth(events, year);

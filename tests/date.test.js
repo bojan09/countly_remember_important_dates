@@ -79,8 +79,8 @@ test('todayISO uses local calendar components', () => {
 
 test('timeLeft: days/hours/minutes to local midnight, null when passed', async () => {
   const { timeLeft } = await import('../src/date/calendar.js');
-  assert.deepEqual(timeLeft('2026-10-29', new Date(2026, 9, 26, 9, 30)), { d: 2, h: 14, m: 30 });
-  assert.deepEqual(timeLeft('2026-10-27', new Date(2026, 9, 26, 23, 59)), { d: 0, h: 0, m: 1 });
+  assert.deepEqual(timeLeft('2026-10-29', new Date(2026, 9, 26, 9, 30)), { d: 2, h: 14, m: 30, s: 0 });
+  assert.deepEqual(timeLeft('2026-10-27', new Date(2026, 9, 26, 23, 59)), { d: 0, h: 0, m: 1, s: 0 });
   assert.equal(timeLeft('2026-10-26', new Date(2026, 9, 26, 0, 0, 1)), null);
   assert.equal(timeLeft('nope'), null);
 });
