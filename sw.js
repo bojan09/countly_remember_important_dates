@@ -1,6 +1,6 @@
 // Countly service worker: precaches the app shell for offline use.
 // Bump VERSION whenever any precached file changes (tests/sw.test.js verifies the list is complete).
-const VERSION = 'countly-shell-v1';
+const VERSION = 'countly-shell-v2';
 
 const SHELL = [
   './',
@@ -51,7 +51,7 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(SHELL)));
+  event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {
