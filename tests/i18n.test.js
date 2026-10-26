@@ -52,7 +52,7 @@ test('dynamic key families are complete (categories, accents, scenes, demo)', ()
   for (const c of CATEGORIES) assert.ok(`categories.${c.id}` in fe && `categories.${c.id}` in fm, c.id);
   for (const id of Object.keys(ACCENTS)) assert.ok(`settings.accents.${id}` in fe && `settings.accents.${id}` in fm, id);
   for (const s of SCENE_KINDS) assert.ok(`scene.${s}` in fe && `scene.${s}` in fm, s);
-  for (let i = 1; i <= 12; i++) assert.ok(`demo.past.p${i}` in fe && `demo.past.p${i}` in fm);
+  for (let i = 1; i <= 26; i++) assert.ok(`demo.past.p${i}` in fe && `demo.past.p${i}` in fm);
 });
 
 test('English day plurals', () => {

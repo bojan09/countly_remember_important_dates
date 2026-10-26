@@ -114,11 +114,11 @@ test('mobile navigation: bottom nav, FAB, More sheet and route changes work', { 
 test('upcoming / this month / past tabs on mobile show truthful counts and lists', { skip }, async () => {
   const page = await openPage(ctx, { viewport: VIEWPORTS['mobile-390'] });
   const counts = await page.$$eval('.m-home .seg-btn .seg-count', (els) => els.map((e) => e.textContent));
-  assert.deepEqual(counts.slice(0, 1), ['8']);
-  assert.equal(counts[2], '12');
-  assert.equal(await page.$$eval('.m-home .ecard', (e) => e.length), 8);
+  assert.deepEqual(counts.slice(0, 1), ['15']);
+  assert.equal(counts[2], '26');
+  assert.equal(await page.$$eval('.m-home .ecard', (e) => e.length), 15);
   await page.click('.m-home .seg-btn[data-id="past"]');
-  assert.equal(await page.$$eval('.m-home .ecard', (e) => e.length), 12);
+  assert.equal(await page.$$eval('.m-home .ecard', (e) => e.length), 26);
   assert.match(await page.$eval('.m-home .ecard .ecard-days', (e) => e.textContent), /ago/);
   await page.close();
 });
@@ -162,9 +162,9 @@ test('calendar: month navigation, day selection and event dots are consistent', 
 
 test('timeline filter and search work', { skip }, async () => {
   const page = await openPage(ctx, { viewport: VIEWPORTS['desktop-1440'], route: '#/timeline' });
-  assert.equal(await page.$$eval('.tl-item', (e) => e.length), 20);
+  assert.equal(await page.$$eval('.tl-item', (e) => e.length), 41);
   await page.click('.seg-btn[data-id="upcoming"]');
-  assert.equal(await page.$$eval('.tl-item', (e) => e.length), 8);
+  assert.equal(await page.$$eval('.tl-item', (e) => e.length), 15);
   await page.type('.tl-search input', 'croatia');
   assert.equal(await page.$$eval('.tl-item', (e) => e.length), 1);
   await page.type('.tl-search input', 'zzzz');
@@ -175,9 +175,9 @@ test('timeline filter and search work', { skip }, async () => {
 test('stats are computed from the actual events', { skip }, async () => {
   const page = await openPage(ctx, { viewport: VIEWPORTS['desktop-1440'], route: '#/stats' });
   const nums = await page.$$eval('.stat-tile b', (e) => e.map((x) => x.textContent));
-  assert.deepEqual(nums, ['20', '8', '12', '5']);
+  assert.deepEqual(nums, ['41', '15', '26', '5']);
   const legend = await page.$$eval('.legend li b', (e) => e.map((x) => Number(x.textContent)));
-  assert.equal(legend.reduce((a, b) => a + b, 0), 20);
+  assert.equal(legend.reduce((a, b) => a + b, 0), 41);
   assert.ok(await page.$eval('.bars', (e) => /Jan/.test(e.getAttribute('aria-label'))));
   await page.close();
 });

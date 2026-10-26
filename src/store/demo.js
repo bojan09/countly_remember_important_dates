@@ -12,6 +12,13 @@ const UPCOMING = [
   { id: 'laptop', titleKey: 'demo.laptop', offset: 65, category: 'personal', scene: 'laptop' },
   { id: 'mountain', titleKey: 'demo.mountain', offset: 24, category: 'travel', scene: 'mountain' },
   { id: 'anniversary', titleKey: 'demo.anniversary', offset: 3, category: 'celebration', scene: 'wedding' },
+  { id: 'concertTix', titleKey: 'demo.concertTix', offset: 8, category: 'celebration', scene: 'concert' },
+  { id: 'flat', titleKey: 'demo.flat', offset: 14, category: 'personal', scene: 'house' },
+  { id: 'launch', titleKey: 'demo.launch', offset: 36, category: 'work', scene: 'rocket' },
+  { id: 'marathon', titleKey: 'demo.marathon', offset: 52, category: 'health', scene: 'runner' },
+  { id: 'friendsWed', titleKey: 'demo.friendsWed', offset: 58, category: 'celebration', scene: 'wedding' },
+  { id: 'grad', titleKey: 'demo.grad', offset: 80, category: 'celebration', scene: 'graduation' },
+  { id: 'nye', titleKey: 'demo.nye', offset: 96, category: 'celebration', scene: 'fireworks' },
 ];
 
 const PAST = [
@@ -27,6 +34,20 @@ const PAST = [
   ['p10', -150, 'celebration', 'wedding'],
   ['p11', -200, 'travel', 'mountain'],
   ['p12', -250, 'celebration', 'fireworks'],
+  ['p13', -30, 'celebration', 'birthday'],
+  ['p14', -47, 'travel', 'mountain'],
+  ['p15', -62, 'personal', 'beach'],
+  ['p16', -80, 'work', 'laptop'],
+  ['p17', -100, 'work', 'rocket'],
+  ['p18', -110, 'health', 'tooth'],
+  ['p19', -130, 'celebration', 'house'],
+  ['p20', -160, 'health', 'runner'],
+  ['p21', -180, 'celebration', 'concert'],
+  ['p22', -210, 'travel', 'coast'],
+  ['p23', -230, 'travel', 'car'],
+  ['p24', -300, 'celebration', 'graduation'],
+  ['p25', -330, 'celebration', 'wedding'],
+  ['p26', -340, 'celebration', 'fireworks'],
 ];
 
 export function buildSampleEvents(todayISO) {

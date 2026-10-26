@@ -9,8 +9,8 @@ import { setLang } from '../src/i18n/index.js';
 for (const today of ['2026-01-01', '2026-02-28', '2026-10-26', '2026-12-31', '2028-02-29']) {
   test(`sample events are truthful relative to ${today}`, () => {
     const ev = buildSampleEvents(today);
-    assert.equal(upcoming(ev, today).length, 8);
-    assert.equal(past(ev, today).length, 12);
+    assert.equal(upcoming(ev, today).length, 15);
+    assert.equal(past(ev, today).length, 26);
     assert.equal(new Set(ev.map((e) => e.id)).size, ev.length, 'unique ids');
     assert.ok(ev.every((e) => e.sample === true), 'every sample is flagged');
     assert.ok(ev.every((e) => parseISODate(e.date)), 'valid dates');

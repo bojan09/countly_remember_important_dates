@@ -136,21 +136,25 @@ function tooth(u, W, H, hero, mood, align = 'left') {
 }
 
 function car(u, W, H, hero, mood, align = 'right') {
-  const cx = align === 'left' ? W * 0.3 : W * 0.62;
-  const gy = H * 0.82;
+  const cx = hero ? W * 0.5 : align === 'left' ? W * 0.3 : W * 0.62;
+  const gy = hero ? H * 0.6 : H * 0.82;
+  const cs = hero ? H / 215 : H / 150;
   return `<defs>${lin(u + 'bg', [[0, '#3c2f48'], [1, '#8c5a5a']])}${lin(u + 'bd', [[0, '#5a5f78'], [1, '#34374a']])}${rad(u + 'wn', [[0, '#ffd9a0'], [1, '#ff9f6a']])}</defs>
   <rect width="${W}" height="${H}" fill="url(#${u}bg)"/>
   <rect x="${W * 0.66}" y="${H * 0.08}" width="${W * 0.28}" height="${H * 0.52}" rx="6" fill="url(#${u}wn)"/><path d="M${W * 0.8} ${H * 0.08} v${H * 0.52} M${W * 0.66} ${H * 0.34} h${W * 0.28}" stroke="#4a3550" stroke-width="3"/>
   <rect y="${gy}" width="${W}" height="${H - gy}" fill="#2a2433"/>
   <g class="sc-glow"><rect x="${W * 0.66}" y="${H * 0.08}" width="${W * 0.28}" height="${H * 0.52}" rx="6" fill="#fff" fill-opacity=".25"/></g>
   ${[0, 1, 2].map((i) => `<rect class="sc-dash" style="animation-delay:${i * 0.5}s" x="${cx - 150 - i * 10}" y="${gy - 34 + i * 14}" width="${26 + i * 8}" height="3" rx="1.5" fill="#fff" fill-opacity=".6"/>`).join('')}
-  <g transform="translate(${cx} ${gy - 20}) scale(${H / 150})"><ellipse cx="0" cy="26" rx="84" ry="7" fill="#000" opacity=".35"/>
+  <g transform="translate(${cx} ${gy - 20}) scale(${cs})"><ellipse cx="0" cy="26" rx="84" ry="7" fill="#000" opacity=".35"/>
     <g class="sc-bob">
-    <path d="M-76 20 L-66 0 Q-60 -8 -46 -10 L-28 -30 Q-22 -36 -10 -36 L26 -36 Q40 -36 48 -26 L62 -10 Q78 -6 80 8 L82 20Z" fill="url(#${u}bd)"/>
-    <path d="M-24 -28 L-14 -32 L8 -32 L8 -12 L-36 -12Z" fill="#aeb6d4" opacity=".85"/><path d="M14 -32 L28 -32 Q36 -30 42 -22 L50 -12 L14 -12Z" fill="#aeb6d4" opacity=".85"/>
-    <path class="sc-glow" d="M80 -2 L132 -14 L132 18 L80 6Z" fill="#ffe28a" fill-opacity=".35"/>
-    <rect x="70" y="-4" width="10" height="6" rx="3" fill="#ffe28a"/>
-    ${[-46, 50].map((x) => `<g transform="translate(${x} 22)"><circle r="15" fill="#14141b"/><g class="sc-spin"><circle r="10" fill="#a8adc4"/><path d="M-10 0H10M0 -10V10M-7 -7L7 7M7 -7L-7 7" stroke="#53576d" stroke-width="2"/><circle r="3" fill="#53576d"/></g></g>`).join('')}
+    <path d="M-84 20 L-84 6 Q-84 -2 -74 -4 L-52 -8 L-36 -30 Q-32 -36 -22 -36 L14 -36 Q22 -36 28 -30 L48 -9 L74 -6 Q87 -4 88 7 L88 20Z" fill="url(#${u}bd)"/>
+    <path d="M-47 -10 L-33 -28 Q-31 -31 -24 -31 L-4 -31 L-4 -10Z" fill="#b9c4e6" opacity=".9"/><path d="M3 -31 L13 -31 Q18 -31 22 -26 L37 -10 L3 -10Z" fill="#b9c4e6" opacity=".9"/>
+    <path d="M-4 -10 V16 M3 -10 V16" stroke="#222538" stroke-width="1.6" opacity=".6"/><rect x="-14" y="-4" width="9" height="3" rx="1.5" fill="#c9cfe6"/><rect x="8" y="-4" width="9" height="3" rx="1.5" fill="#c9cfe6"/>
+    <path d="M-80 2 L80 -1" stroke="#fff" stroke-width="2" opacity=".22"/>
+    <rect x="-86" y="-2" width="7" height="9" rx="3" fill="#ff5d6c"/>
+    <path class="sc-glow" d="M86 0 L150 -16 L150 22 L86 10Z" fill="#ffe28a" fill-opacity=".35"/>
+    <rect x="78" y="-3" width="11" height="9" rx="4" fill="#fff0b0"/>
+    ${[-48, 52].map((x) => `<g transform="translate(${x} 22)"><circle r="19" fill="#1b1d2b"/><circle r="15" fill="#0f1018"/><g class="sc-spin"><circle r="10.5" fill="#cfd4ea"/><path d="M-10 0H10M0 -10V10M-7 -7L7 7M7 -7L-7 7" stroke="#636a8c" stroke-width="2.2"/><circle r="3.2" fill="#636a8c"/></g></g>`).join('')}
     </g>
   </g>`;
 }
@@ -194,7 +198,7 @@ const star = (x, y, r, d = 0, c = '#fff') =>
   `<path class="sc-twinkle" style="animation-delay:${d}s" d="M${x} ${y - r} l${r * 0.28} ${r * 0.72} l${r * 0.72} ${r * 0.28} l${-r * 0.72} ${r * 0.28} l${-r * 0.28} ${r * 0.72} l${-r * 0.28} ${-r * 0.72} l${-r * 0.72} ${-r * 0.28} l${r * 0.72} ${-r * 0.28}z" fill="${c}"/>`;
 
 function concert(u, W, H, hero) {
-  const cx = hero ? W / 2 : W * 0.72;
+  const cx = hero ? W / 2 : W * 0.79;
   const k = H / 240;
   const beam = (x, c, d) => `<polygon class="sc-beam" style="animation-delay:${d}s" points="${x - 8},0 ${x + 8},0 ${x + 70},${H * 0.82} ${x - 70},${H * 0.82}" fill="${c}" fill-opacity=".26"/>`;
   const crowd = [0.08, 0.2, 0.34, 0.5, 0.64, 0.8, 0.92].map((x, i) => `<g class="sc-bob" style="animation-delay:${-i * 0.17}s"><circle cx="${W * x}" cy="${H * 0.9}" r="${11 * k}" fill="#0c0824"/><rect x="${W * x - 3}" y="${H * 0.74}" width="6" height="${H * 0.1}" rx="3" fill="#0c0824"/></g>`).join('');
@@ -247,7 +251,7 @@ function runner(u, W, H, hero) {
 }
 
 function graduation(u, W, H, hero) {
-  const cx = hero ? W / 2 : W * 0.72;
+  const cx = hero ? W / 2 : W * 0.79;
   const k = H / 240;
   const colors = ['#ffd166', '#ff6fa9', '#4dd4c6', '#fff', '#b79bff'];
   const pieces = Array.from({ length: 18 }, (_, i) => `<rect class="sc-fall" style="animation-delay:${-(i % 9) * 0.55}s;animation-duration:${4 + (i % 4)}s" x="${(i * 61) % W}" y="${-10 + (i % 5) * 6}" width="6" height="10" rx="1.5" fill="${colors[i % 5]}"/>`).join('');
@@ -278,7 +282,7 @@ function rocket(u, W, H, hero) {
 }
 
 function wedding(u, W, H, hero) {
-  const cx = hero ? W / 2 : W * 0.72;
+  const cx = hero ? W / 2 : W * 0.79;
   const k = H / 240;
   const heart = (x, d, s) => `<g class="sc-heart" style="animation-delay:${d}s"><path transform="translate(${x} ${H * 0.8}) scale(${s})" d="M0 6 C-14 -6 -8 -16 0 -8 C8 -16 14 -6 0 6Z" fill="#ff5f95"/></g>`;
   return `<defs>${lin(u + 'bg', [[0, '#ffe3f1'], [1, '#c7a8ff']])}${rad(u + 'gl', [[0, '#fff', 0.9], [1, '#fff', 0]])}${lin(u + 'au', [[0, '#fff1b0'], [1, '#d9a441']])}</defs>
