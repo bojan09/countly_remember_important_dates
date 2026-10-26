@@ -1,0 +1,109 @@
+/* Onboarding, More sheet, notifications, misc */
+.ob .field {
+  margin-bottom: 16px;
+}
+
+.ob-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ob-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  border: 2px solid transparent;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.ob-chip[aria-checked='true'] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface-2));
+}
+
+.ob .lbl {
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+
+.ob .toggle-row label {
+  color: var(--text);
+}
+
+.ob .switch {
+  background: color-mix(in srgb, var(--text) 24%, transparent);
+}
+
+.ob .switch[aria-checked='true'] {
+  background: var(--accent);
+}
+
+.more-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.more-row {
+  color: var(--text);
+  min-height: 56px;
+}
+
+.more-list li + li {
+  border-top: 1px solid var(--line);
+}
+
+.notify-empty {
+  text-align: center;
+  padding: 10px 0 6px;
+}
+
+.notify-empty .empty-title {
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.modal .row {
+  color: var(--text);
+}
+
+.modal .row-ico {
+  color: color-mix(in srgb, var(--accent) 65%, #fff);
+}
+
+.page-hidden .scene-art * {
+  animation-play-state: paused !important;
+}
+
+dl,
+dd {
+  margin: 0;
+}
+
+.view > .seg {
+  max-width: 520px;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 767px) {
+  .banner {
+    padding: 10px 12px;
+    font-size: 0.78rem;
+    margin-bottom: 16px;
+  }
+
+  .banner .btn {
+    flex: none;
+    white-space: nowrap;
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 0.78rem;
+  }
+}

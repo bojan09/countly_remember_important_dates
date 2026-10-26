@@ -1,0 +1,103 @@
+/* Countly design tokens. Components never hardcode colors: they read these. */
+:root {
+  color-scheme: dark;
+
+  /* type */
+  --font: Inter, 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, 'Noto Sans', 'Helvetica Neue', Arial, sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-md: 0.9375rem;
+  --fs-lg: 1.0625rem;
+  --fs-xl: 1.375rem;
+  --fs-2xl: 1.75rem;
+  --fs-hero: clamp(2.5rem, 5vw, 3.6rem);
+
+  /* space & shape */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 26px;
+  --r-pill: 999px;
+  --sb-w: 252px;
+
+  /* accent (set at runtime from the Accent Color setting) */
+  --accent: #7356f2;
+  --accent-strong: color-mix(in srgb, var(--accent) 88%, var(--strong-mix, #000));
+  --accent-soft: color-mix(in srgb, var(--accent) 22%, transparent);
+  --accent-ink: #fff;
+  --accent-text: color-mix(in srgb, var(--accent) 58%, #fff);
+  --glow: 0 10px 30px -8px color-mix(in srgb, var(--accent) 70%, transparent);
+
+  /* category + contextual colors */
+  --cat-celebration: #ff5fa2;
+  --cat-travel: #4da3ff;
+  --cat-work: #ff9f43;
+  --cat-health: #2ec4b6;
+  --cat-personal: #a56bff;
+  --cat-other: #6f7bc2;
+  --pink: #ff6fa9;
+  --peach: #ffb38a;
+  --mint: #5fe0c4;
+  --gold: #ffc94d;
+  --danger: #ff6b81;
+
+  /* motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 220ms;
+
+  /* paper sheets: the light cards used on dark screens in the approved design */
+  --paper: #f8f4ff;
+  --paper-2: #efe8ff;
+  --paper-text: #231a4f;
+  --paper-text-2: #5d5789;
+  --paper-line: rgba(80, 60, 160, 0.13);
+}
+
+:root,
+:root[data-theme='dark'] {
+  --bg: #0a0e24;
+  --bg-glow: radial-gradient(900px 520px at 85% -8%, rgba(124, 92, 255, 0.22), transparent 70%),
+    radial-gradient(700px 480px at -5% 105%, rgba(255, 111, 169, 0.1), transparent 70%);
+  --surface: #12183a;
+  --surface-2: #181f48;
+  --surface-3: #1f2756;
+  --line: rgba(150, 160, 255, 0.14);
+  --text: #f2f3ff;
+  --text-2: #b6bbdf;
+  --text-3: #8189b6;
+  --nav-active: color-mix(in srgb, var(--accent) 34%, #12183a);
+  --shadow-1: 0 8px 24px -10px rgba(0, 0, 0, 0.6);
+  --shadow-2: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
+  --scrim: rgba(5, 7, 22, 0.66);
+  --nav-bar: rgba(13, 18, 46, 0.86);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f4f1ff;
+  --bg-glow: radial-gradient(900px 520px at 85% -8%, rgba(124, 92, 255, 0.16), transparent 70%),
+    radial-gradient(700px 480px at -5% 105%, rgba(255, 111, 169, 0.12), transparent 70%);
+  --surface: #ffffff;
+  --surface-2: #f6f2ff;
+  --surface-3: #ece6ff;
+  --line: rgba(60, 50, 140, 0.13);
+  --text: #1c1743;
+  --text-2: #4c4879;
+  --text-3: #66638f;
+  --nav-active: color-mix(in srgb, var(--accent) 16%, #fff);
+  --shadow-1: 0 8px 24px -12px rgba(60, 40, 140, 0.28);
+  --shadow-2: 0 24px 60px -24px rgba(60, 40, 140, 0.35);
+  --scrim: rgba(40, 30, 90, 0.4);
+  --nav-bar: rgba(255, 255, 255, 0.9);
+  --accent-text: color-mix(in srgb, var(--accent) 38%, #1a0e55);
+  --paper: #ffffff;
+  --paper-2: #f3eeff;
+  --paper-line: rgba(80, 60, 160, 0.14);
+}

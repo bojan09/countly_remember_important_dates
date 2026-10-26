@@ -1,0 +1,220 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font);
+  font-size: var(--fs-md);
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--bg-glow), var(--bg);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+button:disabled,
+[aria-disabled='true'] {
+  cursor: not-allowed;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 80%, #fff);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  left: 12px;
+  top: -60px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: var(--r-md);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  transition: top var(--dur) var(--ease);
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+.ico {
+  flex: none;
+}
+
+.ico-wrap {
+  display: inline-flex;
+}
+
+/* Ambient scene motion. Only transforms/opacity; paused offscreen (see app.js). */
+.scene-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sc-float,
+.sc-sway,
+.sc-flame,
+.sc-twinkle,
+.sc-drift,
+.sc-wave,
+.sc-fly {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.sc-float {
+  animation: sc-float 6s ease-in-out infinite;
+}
+
+.sc-float.sc-slow {
+  animation-duration: 9s;
+  animation-delay: -3s;
+}
+
+.sc-sway {
+  transform-origin: 50% 100%;
+  animation: sc-sway 7s ease-in-out infinite;
+}
+
+.sc-flame {
+  transform-origin: 50% 90%;
+  animation: sc-flame 1.4s ease-in-out infinite;
+}
+
+.sc-twinkle {
+  animation: sc-twinkle 3.2s ease-in-out infinite;
+}
+
+.sc-drift {
+  animation: sc-drift 16s ease-in-out infinite alternate;
+}
+
+.sc-wave {
+  animation: sc-wave 5s ease-in-out infinite alternate;
+}
+
+.sc-fly {
+  animation: sc-fly 9s ease-in-out infinite alternate;
+}
+
+.scene-paused * {
+  animation-play-state: paused !important;
+}
+
+@keyframes sc-float {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+@keyframes sc-sway {
+  50% {
+    transform: rotate(1.6deg);
+  }
+}
+@keyframes sc-flame {
+  25% {
+    transform: scale(0.92, 1.08) rotate(-3deg);
+  }
+  60% {
+    transform: scale(1.06, 0.95) rotate(3deg);
+  }
+}
+@keyframes sc-twinkle {
+  50% {
+    opacity: 0.25;
+  }
+}
+@keyframes sc-drift {
+  to {
+    transform: translateX(14px);
+  }
+}
+@keyframes sc-wave {
+  to {
+    transform: translateX(10px);
+  }
+}
+@keyframes sc-fly {
+  to {
+    transform: translate(14px, -4px) rotate(-12deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:root[data-motion='reduced'] *,
+:root[data-motion='reduced'] *::before,
+:root[data-motion='reduced'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
