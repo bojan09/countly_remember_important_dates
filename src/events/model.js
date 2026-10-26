@@ -3,12 +3,14 @@
 import { parseISODate } from '../date/calendar.js';
 import { normalizeRule, FREQS } from '../date/recurrence.js';
 import { isValidTime, isValidTimeZone } from '../date/instant.js';
+import { isKnownCategory, categoryById } from './categories.js';
 
 export const SCHEMA = 1;
 
 export const SCENE_IDS = ['birthday', 'beach', 'coast', 'tooth', 'car', 'laptop', 'mountain', 'concert', 'house', 'runner', 'graduation', 'rocket', 'wedding', 'fireworks', 'deadline', 'holiday'];
-export const CATEGORY_IDS = ['celebration', 'travel', 'work', 'health', 'personal', 'other'];
 export const SCENE_FOR_CATEGORY = { celebration: 'birthday', travel: 'beach', work: 'laptop', health: 'tooth', personal: 'house', other: 'mountain' };
+/** Default scene for a category (built-in map, or the custom category's own choice). */
+export const sceneForCategory = (id) => SCENE_FOR_CATEGORY[id] || categoryById(id).scene || 'mountain';
 
 export const LIMITS = { title: 80, description: 200, notes: 5000, location: 120, emoji: 8, interval: 999 };
 
@@ -80,8 +82,8 @@ export function validateEvent(input) {
   if (str(i.location, 100000).length > LIMITS.location) errors.location = 'locationTooLong';
   if ([...str(i.emoji, 100)].length > 4) errors.emoji = 'emojiTooLong';
 
-  const category = CATEGORY_IDS.includes(i.category) ? i.category : 'other';
-  const scene = SCENE_IDS.includes(i.scene) ? i.scene : SCENE_FOR_CATEGORY[category];
+  const category = isKnownCategory(i.category) ? i.category : 'other';
+  const scene = SCENE_IDS.includes(i.scene) ? i.scene : sceneForCategory(category);
 
   const value = {
     title: title.slice(0, LIMITS.title),
@@ -105,14 +107,14 @@ export function validateEvent(input) {
  * Upgrade/repair a stored record to the current schema. Returns null when the record is
  * unusable (no id or no valid date) so the caller can quarantine it instead of crashing.
  */
-export function migrateRecord(raw) {
+export function migrateRecord(raw, known = null) {
   if (!raw || typeof raw !== 'object' || typeof raw.id !== 'string' || !raw.id) return null;
   if (!isoOrNull(raw.date)) return null;
   const now = Date.now();
   // schema 0 (no `schema` field): flat `repeat: 'yearly'` and `favorite` instead of recurrence/pinned.
   const legacyRepeat = typeof raw.repeat === 'string' && FREQS.includes(raw.repeat) ? raw.repeat : null;
   const rule = normalizeRule(raw.recurrence || (legacyRepeat ? { freq: legacyRepeat } : null));
-  const category = CATEGORY_IDS.includes(raw.category) ? raw.category : 'other';
+  const category = (known ? known(raw.category) : isKnownCategory(raw.category)) ? raw.category : 'other';
   const skips = Array.isArray(raw.skips) ? [...new Set(raw.skips.filter((d) => isoOrNull(d)))].sort() : [];
   const overrides = {};
   if (raw.overrides && typeof raw.overrides === 'object') {
@@ -134,7 +136,7 @@ export function migrateRecord(raw) {
     tz: isValidTime(raw.time) && isValidTimeZone(raw.tz) ? raw.tz : null,
     start: isoOrNull(raw.start),
     category,
-    scene: SCENE_IDS.includes(raw.scene) ? raw.scene : SCENE_FOR_CATEGORY[category],
+    scene: SCENE_IDS.includes(raw.scene) ? raw.scene : sceneForCategory(category),
     location: str(raw.location, LIMITS.location),
     description: str(raw.description, LIMITS.description),
     notes: typeof raw.notes === 'string' ? raw.notes.slice(0, LIMITS.notes) : '',

@@ -5,7 +5,8 @@
 // A backup file is untrusted input: every event goes through the same repair/validation as a
 // stored record (migrateRecord), photos are checked for type, size and ownership, and unknown
 // fields are dropped rather than copied.
-import { migrateRecord } from '../events/model.js';
+import { migrateRecord, SCENE_IDS } from '../events/model.js';
+import { migrateCategory, isKnownCategory } from '../events/categories.js';
 import { sanitizePrefs } from './prefs.js';
 
 export const BACKUP_FORMAT = 'countly-backup';
@@ -41,7 +42,7 @@ export function base64ToBytes(text) {
  * Serialize records + photo rows (each with a `blob`) + preferences.
  * `encode(blob)` -> Promise<Uint8Array>; injectable so tests do not need a real Blob reader.
  */
-export async function buildBackup({ records, photos, prefs, now = new Date() }, encode = async (b) => new Uint8Array(await b.arrayBuffer())) {
+export async function buildBackup({ records, photos, prefs, categories = [], categoryPrefs = { order: [], hidden: [] }, now = new Date() }, encode = async (b) => new Uint8Array(await b.arrayBuffer())) {
   const ids = new Set(records.map((r) => r.id));
   const photoRows = [];
   for (const p of photos) {
@@ -50,7 +51,7 @@ export async function buildBackup({ records, photos, prefs, now = new Date() }, 
   }
   const outPrefs = {};
   for (const k of BACKUP_PREF_KEYS) if (prefs && k in prefs) outPrefs[k] = prefs[k];
-  return { format: BACKUP_FORMAT, version: BACKUP_VERSION, app: 'countly', exportedAt: now.toISOString(), events: records, photos: photoRows, prefs: outPrefs };
+  return { format: BACKUP_FORMAT, version: BACKUP_VERSION, app: 'countly', exportedAt: now.toISOString(), categories, categoryPrefs, events: records, photos: photoRows, prefs: outPrefs };
 }
 
 /**
@@ -72,9 +73,21 @@ export function parseBackup(text, { maxBytes = 8 * 1024 * 1024, maxPerEvent = 12
   if (data.version > BACKUP_VERSION) return { ok: false, error: 'newerVersion' };
 
   const skipped = { events: 0, photos: 0 };
+  const categories = [];
+  const catIds = new Set();
+  for (const raw of Array.isArray(data.categories) ? data.categories.slice(0, 100) : []) {
+    const c = migrateCategory(raw, SCENE_IDS);
+    if (c && !catIds.has(c.id)) {
+      catIds.add(c.id);
+      categories.push(c);
+    }
+  }
+  const strs = (v) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string' && x.length <= ID_MAX).slice(0, 200) : []);
+  const categoryPrefs = { order: strs(data.categoryPrefs && data.categoryPrefs.order), hidden: strs(data.categoryPrefs && data.categoryPrefs.hidden) };
+  const known = (id) => catIds.has(id) || isKnownCategory(id);
   const byId = new Map();
   for (const raw of data.events.slice(0, MAX_EVENTS)) {
-    const rec = raw && typeof raw.id === 'string' && raw.id.length <= ID_MAX ? migrateRecord(raw) : null;
+    const rec = raw && typeof raw.id === 'string' && raw.id.length <= ID_MAX ? migrateRecord(raw, known) : null;
     if (!rec) {
       skipped.events++;
       continue;
@@ -114,16 +127,17 @@ export function parseBackup(text, { maxBytes = 8 * 1024 * 1024, maxPerEvent = 12
     for (const k of BACKUP_PREF_KEYS) if (Object.hasOwn(data.prefs, k)) prefs[k] = clean[k];
   }
   const exportedAt = typeof data.exportedAt === 'string' && !Number.isNaN(Date.parse(data.exportedAt)) ? data.exportedAt : null;
-  return { ok: true, events: [...byId.values()], photos, prefs, exportedAt, skipped };
+  return { ok: true, events: [...byId.values()], photos, categories, categoryPrefs, prefs, exportedAt, skipped };
 }
 
 /**
  * Decide what an import would do. `existing` is a Map id -> stored record, `existingPhotos` a Map
  * eventId -> array of stored photo ids. Merge never deletes; replace overwrites everything.
  */
-export function planImport(parsed, existing, existingPhotos, mode = 'merge', { maxPerEvent = 12 } = {}) {
+export function planImport(parsed, existing, existingPhotos, mode = 'merge', { maxPerEvent = 12, existingCategories = new Map() } = {}) {
+  const cats = parsed.categories || [];
   if (mode === 'replace') {
-    return { mode, add: parsed.events, update: [], unchanged: 0, photos: parsed.photos, remove: [...existing.keys()].filter((id) => !parsed.events.some((e) => e.id === id)) };
+    return { mode, categories: cats, removeCategories: [...existingCategories.keys()].filter((id) => !cats.some((c) => c.id === id)), add: parsed.events, update: [], unchanged: 0, photos: parsed.photos, remove: [...existing.keys()].filter((id) => !parsed.events.some((e) => e.id === id)) };
   }
   const add = [];
   const update = [];
@@ -147,5 +161,6 @@ export function planImport(parsed, existing, existingPhotos, mode = 'merge', { m
     have.set(p.eventId, ids);
     photos.push(p);
   }
-  return { mode, add, update, unchanged, photos, remove: [] };
+  const catWrites = cats.filter((c) => !existingCategories.has(c.id) || c.updatedAt > existingCategories.get(c.id).updatedAt);
+  return { mode, categories: catWrites, removeCategories: [], add, update, unchanged, photos, remove: [] };
 }

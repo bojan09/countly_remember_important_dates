@@ -2,11 +2,12 @@
 //
 // Stores:  events  (keyPath id; index date, updatedAt)
 //          photos  (keyPath id; index eventId)   - Blobs, local only
-//          meta    (keyPath key)                  - schema bookkeeping
+//          meta    (keyPath key)                  - schema bookkeeping + category order/hidden prefs
+//          categories (keyPath id)                - user-made categories (v2)
 // Adding a version = add an entry to MIGRATIONS; upgrades run in order inside the upgrade
 // transaction, so a failed upgrade rolls back and the old data stays readable.
 export const DB_NAME = 'countly';
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 
 export const MIGRATIONS = {
   1(db) {
@@ -16,9 +17,13 @@ export const MIGRATIONS = {
     db.createObjectStore('photos', { keyPath: 'id' }).createIndex('eventId', 'eventId');
     db.createObjectStore('meta', { keyPath: 'key' });
   },
+  // v2: user-made categories. Additive only, so v1 data is untouched.
+  2(db) {
+    if (!db.objectStoreNames.contains('categories')) db.createObjectStore('categories', { keyPath: 'id' });
+  },
 };
 
-const STORES = ['events', 'photos', 'meta'];
+const STORES = ['events', 'photos', 'meta', 'categories'];
 
 const wrap = (req) =>
   new Promise((resolve, reject) => {

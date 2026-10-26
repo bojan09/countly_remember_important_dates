@@ -3,7 +3,7 @@ import { icon } from '../components/icons.js';
 import { pageHeader, mobilePageHead } from '../components/chrome.js';
 import { ring, donutChart, barChart, heatmap, dataTable } from '../components/charts.js';
 import { countByCategory, upcoming, past, uniqueSeries, featuredEvent } from '../events/select.js';
-import { CATEGORIES } from '../events/categories.js';
+import { allCategories, categoryName } from '../events/categories.js';
 import { monthlyCounts, dayCounts, busiest, yearProgress, doneStats } from '../events/analytics.js';
 import { progress, parseISODate } from '../date/calendar.js';
 import { t, formatNumber, formatDate, monthShort } from '../i18n/index.js';
@@ -45,9 +45,9 @@ export default function renderStats(ctx) {
   }
 
   const segmentsOf = (map) =>
-    CATEGORIES.concat([{ id: 'other', color: 'var(--cat-other)' }])
+    allCategories()
       .filter((c) => map.get(c.id))
-      .map((c) => ({ id: c.id, color: c.color, count: map.get(c.id), label: t(`categories.${c.id}`) }));
+      .map((c) => ({ id: c.id, color: c.color, count: map.get(c.id), label: categoryName(c) }));
 
   function distribution(segments, n) {
     const top = [...segments].sort((a, b) => b.count - a.count)[0];

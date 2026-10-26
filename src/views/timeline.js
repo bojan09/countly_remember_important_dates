@@ -3,7 +3,7 @@ import { icon } from '../components/icons.js';
 import { pageHeader, mobilePageHead } from '../components/chrome.js';
 import { sceneSvg } from '../scenes/art.js';
 import { upcoming, past, byDateAsc, byDateDesc } from '../events/select.js';
-import { categoryById, CATEGORIES } from '../events/categories.js';
+import { categoryById, categoryName, visibleCategories } from '../events/categories.js';
 import { t, formatDate } from '../i18n/index.js';
 import { eventTitle } from '../store/demo.js';
 import { getArchived } from '../store/events.js';
@@ -43,7 +43,7 @@ export default function renderTimeline(ctx) {
     state.sort = sortEl.value;
     drawList();
   });
-  const catEl = h('select', { class: 'input', 'aria-label': t('timeline.category') }, option('all', t('timeline.allCategories')), ...[...CATEGORIES.map((c) => c.id), 'other'].map((c) => option(c, t(`categories.${c}`))));
+  const catEl = h('select', { class: 'input', 'aria-label': t('timeline.category') }, option('all', t('timeline.allCategories')), ...visibleCategories(state.cat).map((c) => option(c.id, categoryName(c))));
   catEl.value = state.cat;
   catEl.addEventListener('change', () => {
     state.cat = catEl.value;
@@ -130,7 +130,7 @@ export default function renderTimeline(ctx) {
       if (state.cat !== 'all' && e.category !== state.cat) return false;
       if (state.fav && !e.pinned) return false;
       if (!q) return true;
-      return [eventTitle(e), e.description, e.location, t(`categories.${e.category}`)].some((s) => s && s.toLocaleLowerCase().includes(q));
+      return [eventTitle(e), e.description, e.location, categoryName(e.category)].some((s) => s && s.toLocaleLowerCase().includes(q));
     });
     if (state.sort !== 'default') rows = [...rows].sort(SORTS[state.sort]);
     const filtered = !!query || state.cat !== 'all' || state.fav || state.sort !== 'default';

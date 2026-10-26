@@ -1,5 +1,9 @@
 # Changelog
 
+## Phase 4.2 — Category manager
+- Create, edit, delete, hide and reorder categories (custom name, colour, icon and default picture); deleting moves events to a category you choose.
+- IndexedDB schema v2 (`categories` store); backups include custom categories. Service worker cache v7.
+
 ## Phase 4.1 — Backup, import and export (0.4.0)
 - Export all events, photos and key preferences to a versioned JSON file; last-backup date in Settings.
 - Import with preview, merge (newer wins, never deletes) or replace (typed confirmation + automatic safety backup).

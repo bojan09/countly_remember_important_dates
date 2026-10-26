@@ -1255,3 +1255,138 @@ a:hover .heat-cell {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Category manager */
+.cm-bar {
+  max-width: 720px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 14px;
+  flex-wrap: wrap;
+}
+
+.cm-bar p {
+  margin: 0;
+  flex: 1 1 240px;
+}
+
+.cm-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  max-width: 720px;
+}
+
+.cm-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.cm-item.is-hidden {
+  opacity: 0.62;
+}
+
+.cm-item .cat-ico {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  color: #fff;
+  background: var(--c);
+}
+
+.cm-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cm-main b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cm-main .meter {
+  margin-top: 4px;
+}
+
+.cm-badge {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.cm-actions {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  width: 190px;
+  justify-content: flex-end;
+}
+
+.cm-actions .icon-btn:disabled {
+  opacity: 0.3;
+}
+
+.cm-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cm-opt {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.cm-opt[style*='--sw'] {
+  background: var(--sw);
+  color: transparent;
+  border-color: transparent;
+}
+
+.cm-opt[aria-checked='true'] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.cm-opt[style*='--sw'][aria-checked='true'] {
+  color: #fff;
+  border-color: #fff;
+}
+
+@media (max-width: 480px) {
+  .cm-item {
+    flex-wrap: wrap;
+  }
+
+  .cm-actions {
+    width: 100%;
+  }
+}

@@ -2,7 +2,8 @@ import { h, emptyState, toast } from '../components/ui.js';
 import { mobilePageHead } from '../components/chrome.js';
 import { sceneSvg } from '../scenes/art.js';
 import { t, unit } from '../i18n/index.js';
-import { emptyForm, validateEvent, CATEGORY_IDS, SCENE_IDS, SCENE_FOR_CATEGORY, LIMITS } from '../events/model.js';
+import { emptyForm, validateEvent, SCENE_IDS, sceneForCategory, LIMITS } from '../events/model.js';
+import { visibleCategories, categoryName } from '../events/categories.js';
 import { FREQS } from '../date/recurrence.js';
 import { parseISODate } from '../date/calendar.js';
 import { getSeries, saveEvent } from '../store/events.js';
@@ -31,6 +32,10 @@ export default function renderCreate(ctx, id) {
   }
 
   const seed = existing ? { ...existing, recurrence: { ...existing.recurrence } } : emptyForm(ctx.today);
+  if (!existing) {
+    const first = visibleCategories()[0]; // the built-in default may be hidden
+    if (first) Object.assign(seed, { category: first.id, scene: sceneForCategory(first.id) });
+  }
   if (!editing && ctx.query.get('date') && parseISODate(ctx.query.get('date'))) seed.date = ctx.query.get('date');
   const data = { ...seed };
   let sceneTouched = !!existing; // keep a chosen scene when the category changes
@@ -136,10 +141,10 @@ export default function renderCreate(ctx, id) {
   const catRow = row(
     'category',
     t('form.category'),
-    select('category', CATEGORY_IDS.map((c) => [c, t(`categories.${c}`)]), data.category, (v) => {
+    select('category', visibleCategories(data.category).map((c) => [c.id, categoryName(c)]), data.category, (v) => {
       data.category = v;
       if (!sceneTouched) {
-        data.scene = SCENE_FOR_CATEGORY[v];
+        data.scene = sceneForCategory(v);
         const radio = scenePicker.querySelector(`input[value="${data.scene}"]`);
         if (radio) radio.checked = true;
       }

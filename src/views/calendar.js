@@ -5,7 +5,7 @@ import { calendarGrid, indexByDate } from '../components/calendarGrid.js';
 import { parseISODate, shiftMonth, addDays, weekdayOf, monthGrid, toISO } from '../date/calendar.js';
 import { t, formatMonthYear, formatDate, weekdayNames } from '../i18n/index.js';
 import { eventTitle } from '../store/demo.js';
-import { categoryById } from '../events/categories.js';
+import { categoryById, categoryName } from '../events/categories.js';
 import { getOccurrencesBetween } from '../store/events.js';
 
 // View state survives re-renders (language switch, store updates) within the session.
@@ -20,7 +20,7 @@ const mondayOf = (iso) => addDays(iso, -((weekdayOf(iso) + 6) % 7));
 
 function eventRow(e) {
   const cat = categoryById(e.category);
-  const sub = [e.time || t('calendar.allDay'), t(`categories.${cat.id}`), e.location].filter(Boolean).join(' · ');
+  const sub = [e.time || t('calendar.allDay'), categoryName(cat), e.location].filter(Boolean).join(' · ');
   return h(
     'a',
     { href: `#/event/${encodeURIComponent(e.id)}`, class: 'day-item' },

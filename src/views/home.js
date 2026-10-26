@@ -6,7 +6,7 @@ import { miniCalendar } from '../components/miniCalendar.js';
 import { sceneSvg } from '../scenes/art.js';
 import { progress } from '../date/calendar.js';
 import { upcoming, thisMonth, past, featuredEvent } from '../events/select.js';
-import { CATEGORIES } from '../events/categories.js';
+import { allCategories } from '../events/categories.js';
 import { t, getLang, greetingKey, formatDate, formatNumber, unit } from '../i18n/index.js';
 import { eventTitle } from '../store/demo.js';
 import { logoMark } from '../components/logo.js';
@@ -74,7 +74,7 @@ function desktop(ctx, { up, month, pst }) {
       kpi('calendar', 'var(--cat-travel)', up.length, t('kpi.upcoming')),
       kpi('star', 'var(--gold)', month.length, t('kpi.thisMonth')),
       kpi('image', 'var(--cat-personal)', pst.length, t('kpi.past')),
-      kpi('tag', 'var(--cat-health)', CATEGORIES.filter((c) => ctx.events.some((e) => e.category === c.id)).length, t('kpi.categories')),
+      kpi('tag', 'var(--cat-health)', allCategories().filter((c) => ctx.events.some((e) => e.category === c.id)).length, t('kpi.categories')),
     ),
   );
 

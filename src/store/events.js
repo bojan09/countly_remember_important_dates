@@ -9,7 +9,8 @@
 import { getPrefs } from './prefs.js';
 import { buildSampleEvents } from './demo.js';
 import { openStorage } from './db.js';
-import { migrateRecord, validateEvent, newId, SCHEMA } from '../events/model.js';
+import { migrateRecord, validateEvent, newId, SCHEMA, SCENE_IDS } from '../events/model.js';
+import { configureCategories, customCategories, categoryPrefs, allCategories, migrateCategory, validateCategory, newCategoryId, isKnownCategory } from '../events/categories.js';
 import { nextActive, prevActive, isRecurring, normalizeRule, nextOccurrence, occurrencesBetween } from '../date/recurrence.js';
 import { t } from '../i18n/index.js';
 import { buildBackup, planImport } from './backup.js';
@@ -26,7 +27,24 @@ const listeners = new Set();
 export const storeStatus = { ready: false, persistent: true, error: null, skipped: 0 };
 
 /* ---------- lifecycle ---------- */
+const CAT_PREFS_KEY = 'categoryPrefs';
+const strings = (v) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string').slice(0, 200) : []);
+
+/** Load custom categories and their order/hidden prefs into the registry (must run before events). */
+async function loadCategories() {
+  let list = [];
+  let meta = null;
+  try {
+    list = (await storage.getAll('categories')).map((r) => migrateCategory(r, SCENE_IDS)).filter(Boolean);
+    meta = await storage.get('meta', CAT_PREFS_KEY);
+  } catch (err) {
+    console.error(err); // an unreadable category store must not take the events down with it
+  }
+  configureCategories({ custom: list, order: strings(meta && meta.order), hidden: strings(meta && meta.hidden) });
+}
+
 async function loadAll() {
+  await loadCategories();
   const raw = await storage.getAll('events');
   const next = new Map();
   let skipped = 0;
@@ -76,6 +94,7 @@ export async function initStore({ adapter, broadcast = true } = {}) {
     storeStatus.error = String((err && err.message) || err);
     series = new Map();
     photoMeta = new Map();
+    configureCategories();
   }
   storeStatus.ready = true;
   if (broadcast && typeof BroadcastChannel !== 'undefined' && !channel) {
@@ -358,14 +377,14 @@ export async function removePhoto(eventId, id) {
 /** Serialize every user event, photo and the backup-worthy preferences into backup JSON text. */
 export async function exportBackup(prefs) {
   const photos = await storage.getAll('photos');
-  const backup = await buildBackup({ records: [...series.values()], photos, prefs });
+  const backup = await buildBackup({ records: [...series.values()], photos, prefs, categories: customCategories().map(({ builtin, ...c }) => c), categoryPrefs: categoryPrefs() });
   return { text: JSON.stringify(backup), events: backup.events.length, photos: backup.photos.length };
 }
 
 const photoIdsByEvent = () => new Map([...photoMeta].map(([k, v]) => [k, v.map((p) => p.id)]));
 
 /** What importing `parsed` (from parseBackup) would change, without touching storage. */
-export const previewImport = (parsed, mode) => planImport(parsed, series, photoIdsByEvent(), mode, PHOTO_LIMITS);
+export const previewImport = (parsed, mode) => planImport(parsed, series, photoIdsByEvent(), mode, { ...PHOTO_LIMITS, existingCategories: new Map(customCategories().map((c) => [c.id, c])) });
 
 /**
  * Apply an import. Writes the new data first and only then removes what a replace drops, so a
@@ -373,6 +392,7 @@ export const previewImport = (parsed, mode) => planImport(parsed, series, photoI
  */
 export async function importBackup(parsed, mode = 'merge') {
   const plan = previewImport(parsed, mode);
+  if (plan.categories.length) await storage.putMany('categories', plan.categories);
   await storage.putMany('events', [...plan.add, ...plan.update]);
   if (plan.photos.length) {
     await storage.putMany('photos', plan.photos.map(({ bytes, ...p }) => ({ ...p, blob: new Blob([bytes], { type: p.type }) })));
@@ -383,7 +403,72 @@ export async function importBackup(parsed, mode = 'merge') {
     for (const id of plan.remove) await storage.delete('events', id);
     for (const p of await storage.getAll('photos')) if (!keepPhotos.has(p.id) || !keep.has(p.eventId)) await storage.delete('photos', p.id);
   }
+  if (mode === 'replace') {
+    for (const id of plan.removeCategories) await storage.delete('categories', id);
+    await savePrefs(parsed.categoryPrefs.order, parsed.categoryPrefs.hidden);
+  }
   await loadAll();
   bump();
-  return { added: plan.add.length, updated: plan.update.length, unchanged: plan.unchanged, photos: plan.photos.length, removed: plan.remove.length };
+  return { added: plan.add.length, updated: plan.update.length, unchanged: plan.unchanged, photos: plan.photos.length, removed: plan.remove.length, categories: plan.categories.length };
+}
+
+/* ---------- categories ---------- */
+async function savePrefs(order, hidden) {
+  await storage.put('meta', { key: CAT_PREFS_KEY, order, hidden });
+}
+
+/** Create (id omitted) or update a custom category. Returns { ok, category } or { ok:false, errors }. */
+export async function saveCategory(input, id = null) {
+  const existing = id ? customCategories().find((c) => c.id === id) : null;
+  if (id && !existing) return { ok: false, errors: { _: 'notFound' } };
+  const { ok, errors, value } = validateCategory(input, { sceneIds: SCENE_IDS, selfId: id });
+  if (!ok) return { ok: false, errors };
+  const now = Date.now();
+  const rec = { createdAt: now, ...(existing || {}), ...value, id: existing ? existing.id : newCategoryId(), updatedAt: now };
+  delete rec.builtin;
+  await storage.put('categories', rec);
+  await loadCategories();
+  bump();
+  return { ok: true, category: rec };
+}
+
+export const categoryUseCount = (id) => [...series.values()].filter((s) => s.category === id).length;
+
+/** Delete a custom category, moving its events to `moveTo`. Returns the number of events moved. */
+export async function removeCategory(id, moveTo = 'other') {
+  if (!customCategories().some((c) => c.id === id)) return null;
+  const target = moveTo !== id && isKnownCategory(moveTo) ? moveTo : 'other';
+  const now = Date.now();
+  const moved = [...series.values()].filter((s) => s.category === id).map((s) => ({ ...s, category: target, updatedAt: now }));
+  if (moved.length) await storage.putMany('events', moved);
+  await storage.delete('categories', id);
+  const prefs = categoryPrefs();
+  await savePrefs(prefs.order.filter((x) => x !== id), prefs.hidden.filter((x) => x !== id));
+  for (const rec of moved) series.set(rec.id, rec);
+  await loadCategories();
+  bump();
+  return moved.length;
+}
+
+export async function setCategoryHidden(id, isHidden) {
+  if (id === 'other' || !isKnownCategory(id)) return;
+  const { order, hidden } = categoryPrefs();
+  const next = new Set(hidden);
+  if (isHidden) next.add(id);
+  else next.delete(id);
+  await savePrefs(order, [...next]);
+  await loadCategories();
+  bump();
+}
+
+/** Move a category one step up (-1) or down (+1) in the displayed order. */
+export async function moveCategory(id, delta) {
+  const ids = allCategories().map((c) => c.id);
+  const i = ids.indexOf(id);
+  const j = i + delta;
+  if (i === -1 || j < 0 || j >= ids.length) return;
+  [ids[i], ids[j]] = [ids[j], ids[i]];
+  await savePrefs(ids, categoryPrefs().hidden);
+  await loadCategories();
+  bump();
 }
