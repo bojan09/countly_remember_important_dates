@@ -1,6 +1,7 @@
 import { loadPrefs, getPrefs, setPref as storeSetPref, applyPrefs, onPrefChange } from './store/prefs.js';
 import { setLang, getLang, t, LANGS } from './i18n/index.js';
 import { todayISO } from './date/calendar.js';
+import { tickLive } from './components/eventCard.js';
 import { getEvents, getEvent } from './store/events.js';
 import { h, openModal, toast } from './components/ui.js';
 import { icon, flagSvg } from './components/icons.js';
@@ -293,7 +294,10 @@ function checkDayChange() {
     renderRoute({ keepScroll: true });
   }
 }
-setInterval(checkDayChange, 30000);
+setInterval(() => {
+  checkDayChange();
+  tickLive();
+}, 15000);
 window.addEventListener('focus', checkDayChange);
 
 /* ---------- boot ---------- */

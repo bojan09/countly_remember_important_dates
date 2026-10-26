@@ -1,5 +1,11 @@
 # Changelog
 
+## Phase 1 follow-up — scene motion and live countdown
+- Fixed: CSS animation overrode the SVG `transform` attribute, so the tooth, laptop and plane jumped to the corner. Animated groups are now wrapped.
+- Every scene is animated with its own motion (car wheels spin and headlight glows, tooth bounces and blinks, laptop types, sailboat and gulls, birds and pulsing sun, etc.).
+- 7 new scenes (concert, house, runner, graduation, rocket, wedding, fireworks) so sample events no longer repeat the same art; EN/MK labels added.
+- Live "3d 14h 22m" countdown (days, hours, minutes to local midnight) on cards, hero and detail; refreshes every 15 s.
+
 ## Phase 1 — PWA foundation and design system (0.1.0)
 
 - Installable offline-first PWA shell (manifest, icons, versioned service worker, update flow).

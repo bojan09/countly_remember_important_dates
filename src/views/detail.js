@@ -5,7 +5,7 @@ import { progress } from '../date/calendar.js';
 import { categoryById } from '../events/categories.js';
 import { t, formatDate, formatNumber, unit } from '../i18n/index.js';
 import { eventTitle, eventNotes } from '../store/demo.js';
-import { daysLabel } from '../components/eventCard.js';
+import { daysLabel, liveCountdown } from '../components/eventCard.js';
 import { sampleBadge } from '../components/ui.js';
 
 const PHOTO_SCENES = ['car', 'coast', 'birthday'];
@@ -38,6 +38,7 @@ export default function renderDetail(ctx, id) {
     { class: 'd-sheet', style: { '--cat': cat.color } },
     h('h1', { class: 'd-title' }, title, ev.emoji ? h('span', { 'aria-hidden': 'true' }, ` ${ev.emoji}`) : null, ev.sample ? sampleBadge() : null),
     h('div', { class: 'd-days' }, daysLabel(ev, ctx.today)),
+    liveCountdown(ev, 'live-left d-live'),
     h('div', { class: 'd-date' }, formatDate(ev.date, { year: 'numeric', month: 'short', day: 'numeric' })),
     h('div', { class: 'd-wd' }, formatDate(ev.date, { weekday: 'long' })),
     prog

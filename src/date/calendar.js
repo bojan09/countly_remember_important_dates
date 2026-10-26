@@ -95,6 +95,16 @@ export function progress(startISO, dateISO, todayStr) {
   return { total, elapsed, remaining: total - elapsed, percent: Math.round((elapsed / total) * 100) };
 }
 
+/** Time until local midnight starting `dateISO`: whole days, hours, minutes. null when passed/invalid. */
+export function timeLeft(dateISO, now = new Date()) {
+  const p = parseISODate(dateISO);
+  if (!p) return null;
+  const ms = new Date(p.y, p.m - 1, p.d, 0, 0, 0).getTime() - now.getTime();
+  if (!(ms > 0)) return null;
+  const mins = Math.floor(ms / 60000);
+  return { d: Math.floor(mins / 1440), h: Math.floor((mins % 1440) / 60), m: mins % 60 };
+}
+
 export function sameMonth(iso, { y, m }) {
   const p = parseISODate(iso);
   return !!p && p.y === y && p.m === m;

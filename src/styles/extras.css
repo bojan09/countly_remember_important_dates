@@ -107,3 +107,22 @@ dd {
     font-size: 0.78rem;
   }
 }
+
+/* Live days / hours / minutes countdown */
+.live-left {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+  margin-top: 4px;
+  color: var(--ink-strong, currentColor);
+  opacity: 0.85;
+}
+.live-left[hidden] {
+  display: none;
+}
+.hero-live,
+.d-live {
+  font-size: 1rem;
+  margin-top: 6px;
+}

@@ -61,6 +61,8 @@ export default {
     day: { one: 'day', other: 'days' },
   },
   rel: {
+    timeLeft: '{d}d {h}h {m}m',
+    timeLeftLabel: '{d} days, {h} hours, {m} minutes left',
     today: 'Today',
     tomorrow: 'Tomorrow',
     yesterday: 'Yesterday',
@@ -258,6 +260,13 @@ export default {
     car: 'Car in a garage',
     laptop: 'Laptop with a glowing screen',
     mountain: 'Mountain landscape',
+    concert: 'Concert stage with spotlights',
+    house: 'Cozy house with moving boxes',
+    runner: 'Runner heading for the finish line',
+    graduation: 'Graduation cap tossed in the air',
+    rocket: 'Rocket launching into space',
+    wedding: 'Wedding rings with floating hearts',
+    fireworks: 'Fireworks over the city',
   },
   demo: {
     birthday: 'My Birthday',
