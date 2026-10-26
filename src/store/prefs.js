@@ -28,7 +28,7 @@ export const DEFAULT_PREFS = Object.freeze({
   lang: 'en',
   theme: 'auto', // 'light' | 'dark' | 'auto'
   accent: 'violet',
-  reduceMotion: false,
+  motion: 'full', // 'full' | 'calm' | 'off'
   name: '',
   showSamples: true,
   onboarded: false,
@@ -54,7 +54,9 @@ function sanitize(input) {
   if (input.lang === 'en' || input.lang === 'mk') out.lang = input.lang;
   if (['light', 'dark', 'auto'].includes(input.theme)) out.theme = input.theme;
   if (Object.hasOwn(ACCENTS, input.accent)) out.accent = input.accent;
-  for (const k of ['reduceMotion', 'showSamples', 'onboarded', 'sidebarCollapsed']) {
+  if (['full', 'calm', 'off'].includes(input.motion)) out.motion = input.motion;
+  else if (input.reduceMotion === true) out.motion = 'off'; // pre-0.3 preference
+  for (const k of ['showSamples', 'onboarded', 'sidebarCollapsed']) {
     if (typeof input[k] === 'boolean') out[k] = input[k];
   }
   if (typeof input.name === 'string') out.name = input.name.slice(0, 40);
@@ -95,7 +97,7 @@ export function resolveTheme(theme = prefs.theme) {
 export function applyPrefs(root = document.documentElement) {
   root.dataset.theme = resolveTheme();
   root.dataset.themePref = prefs.theme;
-  root.dataset.motion = prefs.reduceMotion ? 'reduced' : 'full';
+  root.dataset.motion = prefs.motion === 'off' ? 'reduced' : prefs.motion;
   root.style.setProperty('--accent', ACCENTS[prefs.accent]);
   root.style.setProperty('--accent-ink', ACCENT_INK[prefs.accent]);
   root.style.setProperty('--strong-mix', ACCENT_INK[prefs.accent] === '#ffffff' ? '#000' : '#fff');

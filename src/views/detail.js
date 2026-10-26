@@ -6,7 +6,8 @@ import { categoryById } from '../events/categories.js';
 import { recurrenceSummary, timeLine } from '../events/format.js';
 import { t, formatDate, formatNumber, unit } from '../i18n/index.js';
 import { eventTitle, eventNotes } from '../store/demo.js';
-import { daysLabel, liveCountdown } from '../components/eventCard.js';
+import { daysLabel, daysCounter, liveCountdown } from '../components/eventCard.js';
+import { celebrationBurst } from '../components/roll.js';
 import { getSeries, removeEvent, restoreRemoved, duplicateEvent, setArchived, setPinned, setSkipped, setOverride, listPhotos, addPhoto, getPhotoBlob, removePhoto } from '../store/events.js';
 
 const PHOTO_SCENES = ['car', 'coast', 'birthday'];
@@ -126,6 +127,7 @@ export default function renderDetail(ctx, id) {
     'div',
     { class: 'd-hero' },
     h('div', { class: 'art', html: sceneSvg(ev.scene, { variant: 'hero', mood: 'sunset', label: t(`scene.${ev.scene}`) }) }),
+    ev.date === ctx.today ? celebrationBurst(`${ev.id}|${ev.date}`, h) : null,
     h(
       'div',
       { class: 'd-top' },
@@ -150,7 +152,7 @@ export default function renderDetail(ctx, id) {
     h('h1', { class: 'd-title' }, title, ev.emoji ? h('span', { 'aria-hidden': 'true' }, ` ${ev.emoji}`) : null, ...badges),
     ev.description ? h('p', { class: 'd-desc' }, ev.description) : null,
     skipped ? h('p', { class: 'd-skip' }, t('detail.skippedNote')) : null,
-    h('div', { class: 'd-days' }, daysLabel(ev, ctx.today)),
+    daysCounter(ev, ctx.today, 'd-days'),
     isPast ? null : liveCountdown(ev, 'live-left d-live', { seconds: true }),
     h('div', { class: 'd-date' }, formatDate(ev.date, { year: 'numeric', month: 'short', day: 'numeric' })),
     h('div', { class: 'd-wd' }, formatDate(ev.date, { weekday: 'long' })),
@@ -178,7 +180,7 @@ export default function renderDetail(ctx, id) {
 }
 
 function samplePhotos(ev) {
-  return h('section', { class: 'd-photos' }, h('h2', null, t('detail.photos', { count: ev.photos })), h('div', { class: 'd-thumbs' }, PHOTO_SCENES.slice(0, ev.photos).map((s) => h('span', { class: 'd-thumb', html: sceneSvg(s, { variant: 'card', mood: 'day', align: 'right' }) }))));
+  return h('section', { class: 'd-photos' }, h('h2', null, t('detail.photos', { count: ev.photos })), h('div', { class: 'd-thumbs' }, PHOTO_SCENES.slice(0, ev.photos).map((s) => h('span', { class: 'd-thumb', html: sceneSvg(s, { variant: 'card', mood: 'day', align: 'right', animate: false }) }))));
 }
 
 /** Local photos (Blobs in IndexedDB). Thumbnail object URLs are revoked the next time a photo section renders. */

@@ -316,12 +316,61 @@ function fireworks(u, W, H, hero) {
   ${[0.12, 0.34, 0.62, 0.84].map((x, i) => `<rect class="sc-glow" style="animation-delay:${i * 0.4}s" x="${W * x}" y="${H * 0.82}" width="5" height="6" fill="#ffd166"/>`).join('')}`;
 }
 
-const SCENES = { birthday, beach, coast, tooth, car, laptop, mountain, concert, house, runner, graduation, rocket, wedding, fireworks };
+function deadline(u, W, H, hero) {
+  const cx = hero ? W / 2 : W * 0.76;
+  const k = H / 240;
+  const ticks = Array.from({ length: 12 }, (_, i) => `<path d="M0 -46 V${i % 3 === 0 ? -38 : -42}" stroke="#4a3a9a" stroke-width="${i % 3 === 0 ? 4 : 2.4}" stroke-linecap="round" transform="rotate(${i * 30})"/>`).join('');
+  const hand = (cls, len, w, color) => `<g class="${cls}"><rect x="${-w / 2}" y="${-len}" width="${w}" height="${len}" rx="${w / 2}" fill="${color}"/><rect x="${-w / 2}" y="0" width="${w}" height="${len}" fill="transparent"/></g>`;
+  return `<defs>${lin(u + 'bg', [[0, '#2b1b6e'], [1, '#e2478f']], 0, 0, 1, 1)}${rad(u + 'gl', [[0, '#fff', 0.6], [1, '#fff', 0]])}${lin(u + 'cl', [[0, '#ffffff'], [1, '#dfe3ff']])}</defs>
+  <rect width="${W}" height="${H}" fill="url(#${u}bg)"/>
+  <circle class="sc-pulse" cx="${cx}" cy="${H * 0.5}" r="${100 * k}" fill="url(#${u}gl)"/>
+  ${star(W * 0.1, H * 0.2, 7, 0)}${star(W * 0.32, H * 0.12, 5, 1)}${star(W * 0.5, H * 0.86, 6, 2)}${star(W * 0.94, H * 0.12, 5, 1.4)}
+  <g transform="translate(${cx - 92 * k} ${H * 0.2}) rotate(-9) scale(${k})"><rect width="76" height="86" rx="10" fill="#fff"/><path d="M0 10a10 10 0 0 1 10-10h56a10 10 0 0 1 10 10v16H0z" fill="#ff5d6c"/>
+    <g class="sc-flip"><rect x="8" y="34" width="60" height="42" rx="6" fill="#f1f0ff"/><text x="38" y="66" text-anchor="middle" font-size="30" font-weight="800" font-family="Inter,Segoe UI,Arial,sans-serif" fill="#3a2a9a">31</text></g></g>
+  <g transform="translate(${cx + 8 * k} ${H * 0.52}) scale(${k * 1.1})">
+    <g class="sc-ring"><circle cx="-38" cy="-52" r="13" fill="#ffd166"/></g><g class="sc-ring" style="animation-delay:-.15s"><circle cx="38" cy="-52" r="13" fill="#ffd166"/></g>
+    <path d="M-34 52 L-44 66 M34 52 L44 66" stroke="#2b1b6e" stroke-width="7" stroke-linecap="round"/>
+    <circle r="56" fill="url(#${u}cl)" stroke="#6a4fc4" stroke-width="7"/>${ticks}
+    ${hand('sc-tick-slow', 28, 6, '#2b1b6e')}${hand('sc-tick', 40, 4, '#e2478f')}<circle r="5.5" fill="#2b1b6e"/>
+  </g>`;
+}
+
+function holiday(u, W, H, hero) {
+  const cx = hero ? W / 2 : W * 0.74;
+  const k = H / 240;
+  const flakes = Array.from({ length: 22 }, (_, i) => `<circle class="sc-snow" style="animation-delay:${-(i % 11) * 0.9}s;animation-duration:${6 + (i % 5)}s" cx="${(i * 53) % W}" cy="0" r="${1.6 + (i % 3) * 0.9}" fill="#fff" fill-opacity=".9"/>`).join('');
+  const bulbs = [[-18, -34, '#ff6fa9'], [14, -42, '#ffd166'], [-30, -8, '#4dd4c6'], [26, -10, '#ff9f43'], [-10, 16, '#ffd166'], [34, 24, '#ff6fa9'], [-38, 28, '#7c5cff'], [6, 6, '#4dd4c6']];
+  return `<defs>${lin(u + 'bg', [[0, '#0b1a4a'], [1, '#4a6fd0']])}${lin(u + 'tr', [[0, '#2fa05a'], [1, '#17683b']])}${rad(u + 'gl', [[0, '#ffe28a', 0.7], [1, '#ffe28a', 0]])}</defs>
+  <rect width="${W}" height="${H}" fill="url(#${u}bg)"/>
+  <circle cx="${W * 0.1}" cy="${H * 0.2}" r="${16 * k}" fill="#fff4c2" opacity=".92"/>
+  ${star(W * 0.3, H * 0.14, 5, 0)}${star(W * 0.5, H * 0.3, 4, 1.1)}${star(W * 0.92, H * 0.18, 6, 0.5)}
+  <path d="M0 ${H * 0.86} Q${W * 0.3} ${H * 0.78} ${W * 0.6} ${H * 0.85} T${W} ${H * 0.82} V${H} H0Z" fill="#e8efff"/>
+  <g transform="translate(${cx} ${H * 0.84}) scale(${k * 1.1})">
+    <circle class="sc-pulse" cx="0" cy="-110" r="46" fill="url(#${u}gl)"/>
+    <rect x="-6" y="-14" width="12" height="16" fill="#6b4226"/>
+    <path d="M0 -98 L46 -40 H-46Z M0 -66 L58 4 H-58Z M0 -34 L68 22 H-68Z" transform="translate(0 -4)" fill="url(#${u}tr)"/>
+    <path d="M-24 -46 q8 6 14 0 q8 6 14 0 q8 6 14 0 M-34 -12 q10 7 18 0 q10 7 18 0 q10 7 18 0" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".9" transform="translate(0 -4)"/>
+    ${bulbs.map(([x, y, c], i) => `<circle class="sc-twinkle" style="animation-delay:${i * 0.35}s" cx="${x}" cy="${y}" r="4.2" fill="${c}"/>`).join('')}
+    <g class="sc-pulse"><path d="M0 -118 l5 11 l12 1.5 l-9 8 l3 12 l-11 -6.500 l-11 6.500 l3 -12 l-9 -8 l12 -1.500z" fill="#ffd166"/></g>
+    <rect x="-62" y="2" width="26" height="20" rx="3" fill="#ff6fa9"/><path d="M-49 2 V22" stroke="#ffe0a8" stroke-width="4"/>
+    <rect x="38" y="6" width="22" height="16" rx="3" fill="#7c5cff"/><path d="M38 14 H60" stroke="#ffe0a8" stroke-width="4"/>
+  </g>
+  ${flakes}`;
+}
+
+const SCENES = { birthday, beach, coast, tooth, car, laptop, mountain, concert, house, runner, graduation, rocket, wedding, fireworks, deadline, holiday };
 
 export const SCENE_KINDS = Object.keys(SCENES);
 
+// Scene markup is generated once per (kind, size, mood, align) and reused. Gradient ids are made
+// unique per instance by swapping the placeholder token, so the (comparatively expensive) string
+// building never repeats when lists re-render.
+const PLACEHOLDER = 'sUID';
+const cache = new Map();
+
 /**
- * Returns an <svg> string. opts: { variant: 'card' | 'hero', mood: 'day' | 'sunset', align: 'left' | 'right', label }
+ * Returns an <svg> string. opts: { variant: 'card' | 'hero' | 'wide', mood: 'day' | 'sunset', align: 'left' | 'right', label,
+ * animate: false for static thumbnails (no CSS animation is started) }.
  * 'hero' uses a taller viewBox for full-bleed headers and share images; 'wide' a short banner (desktop hero).
  */
 export function sceneSvg(kind, opts = {}) {
@@ -329,8 +378,14 @@ export function sceneSvg(kind, opts = {}) {
   const hero = opts.variant === 'hero';
   const W = 400;
   const H = hero ? 360 : opts.variant === 'wide' ? 170 : 240;
+  const key = `${kind}|${W}x${H}|${hero}|${opts.mood || 'sunset'}|${opts.align || ''}`;
+  let inner = cache.get(key);
+  if (!inner) {
+    inner = fn(PLACEHOLDER, W, H, hero, opts.mood || 'sunset', opts.align);
+    cache.set(key, inner);
+  }
   const u = `s${++counter}`;
-  const inner = fn(u, W, H, hero, opts.mood || 'sunset', opts.align);
   const a11y = opts.label ? `role="img" aria-label="${opts.label.replace(/"/g, '&quot;')}"` : 'aria-hidden="true"';
-  return `<svg class="scene-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="${opts.fit || 'xMidYMid slice'}" ${a11y} focusable="false">${inner}</svg>`;
+  const cls = opts.animate === false ? 'scene-art static' : 'scene-art';
+  return `<svg class="${cls}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="${opts.fit || 'xMidYMid slice'}" ${a11y} focusable="false">${inner.split(PLACEHOLDER).join(u)}</svg>`;
 }

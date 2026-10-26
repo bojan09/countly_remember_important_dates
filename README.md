@@ -30,7 +30,7 @@ Any static file host works (GitHub Pages, Netlify, Vercel, Cloudflare Pages): se
 
 ## Not yet built (later phases)
 
-Creating/editing/saving your own events and recurrence (Phase 2), living animated scenes and richer analytics (Phase 3), week/agenda views, category manager, milestones, memory notes/photos (Phase 4), share image studio, reminders, backup/import/export (Phase 5), final polish (Phase 6). Disabled controls say so ("Soon") instead of pretending to work.
+Category manager, milestones, memory notes/photos (Phase 4), share image studio, reminders, backup/import/export (Phase 5), final polish (Phase 6). Disabled controls say so ("Soon") instead of pretending to work.
 
 ## Privacy and limits
 

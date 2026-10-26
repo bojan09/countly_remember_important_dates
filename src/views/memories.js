@@ -24,7 +24,7 @@ export default function renderMemories(ctx) {
           h(
             'a',
             { href: `#/event/${encodeURIComponent(e.id)}`, class: 'mem-card', 'aria-label': t('actions.open', { title: eventTitle(e) }) },
-            h('span', { class: 'mem-art', html: sceneSvg(e.scene, { variant: 'card', mood: 'day', align: 'right' }) }),
+            h('span', { class: 'mem-art', html: sceneSvg(e.scene, { variant: 'card', mood: 'day', align: 'right', animate: false }) }),
             h('span', { class: 'mem-txt' }, h('b', null, eventTitle(e)), h('small', null, formatDate(e.date)), h('small', { class: 'dim' }, t('memories.ago', { when: daysLabel(e, ctx.today).replace(/^\S/, (c) => c.toLowerCase()) }))),
           ),
         ),

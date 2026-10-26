@@ -6,7 +6,7 @@ import { isValidTime, isValidTimeZone } from '../date/instant.js';
 
 export const SCHEMA = 1;
 
-export const SCENE_IDS = ['birthday', 'beach', 'coast', 'tooth', 'car', 'laptop', 'mountain', 'concert', 'house', 'runner', 'graduation', 'rocket', 'wedding', 'fireworks'];
+export const SCENE_IDS = ['birthday', 'beach', 'coast', 'tooth', 'car', 'laptop', 'mountain', 'concert', 'house', 'runner', 'graduation', 'rocket', 'wedding', 'fireworks', 'deadline', 'holiday'];
 export const CATEGORY_IDS = ['celebration', 'travel', 'work', 'health', 'personal', 'other'];
 export const SCENE_FOR_CATEGORY = { celebration: 'birthday', travel: 'beach', work: 'laptop', health: 'tooth', personal: 'house', other: 'mountain' };
 

@@ -663,3 +663,536 @@ html {
   max-height: 232px;
   min-height: 190px;
 }
+
+/* ================= Phase 3: living scenes, motion levels, charts ================= */
+
+/* new scene classes */
+.sc-tick,
+.sc-tick-slow,
+.sc-ring,
+.sc-flip,
+.sc-snow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.sc-tick {
+  animation: sc-spin 8s linear infinite;
+}
+.sc-tick-slow {
+  animation: sc-spin 96s linear infinite;
+}
+.sc-ring {
+  transform-origin: 50% 100%;
+  animation: sc-ringing 1.6s ease-in-out infinite;
+}
+.sc-flip {
+  transform-origin: 50% 0%;
+  animation: sc-flip 4s ease-in-out infinite;
+}
+.sc-snow {
+  animation: sc-snow 8s linear infinite;
+}
+@keyframes sc-ringing {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0);
+  }
+  10% {
+    transform: rotate(-14deg);
+  }
+  20% {
+    transform: rotate(12deg);
+  }
+  30% {
+    transform: rotate(-10deg);
+  }
+  40% {
+    transform: rotate(8deg);
+  }
+  50% {
+    transform: rotate(-4deg);
+  }
+}
+@keyframes sc-flip {
+  0%,
+  60%,
+  100% {
+    transform: scaleY(1);
+  }
+  70% {
+    transform: scaleY(0.08);
+  }
+  80% {
+    transform: scaleY(1);
+  }
+}
+@keyframes sc-snow {
+  0% {
+    transform: translate(0, -14px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(10px, 130px);
+  }
+  100% {
+    transform: translate(-6px, 270px);
+    opacity: 0.9;
+  }
+}
+
+/* motion levels: calm keeps only gentle ambient motion; static thumbnails never animate */
+:root[data-motion='calm'] .scene-art :is(.sc-bounce, .sc-blink, .sc-rise, .sc-spin, .sc-spin-slow, .sc-bob, .sc-dash, .sc-type, .sc-sail, .sc-glide, .sc-flap, .sc-beam, .sc-note, .sc-toss, .sc-fall, .sc-burst, .sc-swing, .sc-shake, .sc-smoke, .sc-heart, .sc-flame, .sc-fly, .sc-tick, .sc-tick-slow, .sc-ring, .sc-flip, .sc-snow) {
+  animation: none;
+}
+.scene-art.static,
+.scene-art.static * {
+  animation: none !important;
+}
+
+/* hover + press */
+.ecard .art,
+.tl-card .tl-thumb,
+.d-act-btn {
+  overflow: hidden;
+}
+.ecard .scene-art {
+  transition: transform 700ms var(--ease);
+}
+.ecard:hover .scene-art,
+.ecard:focus-visible .scene-art {
+  transform: scale(1.05);
+}
+.ecard:active {
+  transform: scale(0.985);
+}
+.tl-card,
+.mem-card,
+.day-item,
+.d-act-btn,
+.wk-ev {
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.tl-card:hover,
+.mem-card:hover {
+  transform: translateY(-2px);
+}
+.tl-card:active,
+.mem-card:active,
+.day-item:active,
+.wk-ev:active {
+  transform: scale(0.985);
+}
+.d-act-btn:hover {
+  transform: translateY(-2px);
+}
+.d-act-btn:active {
+  transform: scale(0.92);
+}
+
+/* route transitions */
+.route-enter {
+  animation: view-in 260ms var(--ease) both;
+}
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+}
+::view-transition-group(ev-art) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease);
+}
+:root[data-motion='reduced'] ::view-transition-group(*),
+:root[data-motion='reduced'] ::view-transition-old(*),
+:root[data-motion='reduced'] ::view-transition-new(*) {
+  animation: none !important;
+}
+
+/* rolling numerals + progress reveal + celebration */
+.roll-ch {
+  display: inline-block;
+  white-space: pre;
+}
+.roll-ch.roll {
+  animation: roll-in 320ms var(--ease) both;
+}
+@keyframes roll-in {
+  from {
+    transform: translateY(-65%);
+    opacity: 0;
+  }
+}
+.meter > i {
+  transform-origin: left center;
+  animation: meter-grow 900ms var(--ease) both;
+}
+@keyframes meter-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+:root[data-motion='calm'] .roll-ch.roll {
+  animation: none;
+}
+.burst {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+.burst i {
+  position: absolute;
+  top: -14px;
+  left: var(--x);
+  width: 8px;
+  height: 13px;
+  border-radius: 2px;
+  background: var(--c);
+  transform: rotate(var(--r));
+  animation: burst-fall 2.6s ease-in var(--d) 1 both;
+}
+@keyframes burst-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--r));
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(380px) rotate(calc(var(--r) + 520deg));
+  }
+}
+.d-hero {
+  position: relative;
+}
+
+/* settings: motion level */
+.motion-opts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.motion-opts .theme-opt {
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 92px;
+  padding: 10px 8px;
+  text-align: center;
+}
+.motion-opts .theme-opt small {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* ---- charts ---- */
+.stats-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 14px;
+}
+.rings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 16px 10px;
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border: 1px solid var(--line);
+  text-align: center;
+}
+.ring-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.ring-track {
+  stroke: color-mix(in srgb, var(--text) 12%, transparent);
+}
+.ring-arc {
+  animation: ring-fill 1100ms var(--ease) both;
+}
+@keyframes ring-fill {
+  from {
+    stroke-dasharray: 0 var(--ring-len);
+  }
+}
+.ring-num {
+  position: absolute;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+.ring figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.ring-title {
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+.ring figcaption small {
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.donut-seg {
+  cursor: pointer;
+  transition: opacity 160ms ease, stroke-width 160ms ease;
+  outline: none;
+}
+.donut-seg.dim {
+  opacity: 0.35;
+}
+.donut-seg.on,
+.donut-seg:focus-visible {
+  stroke-width: 31;
+}
+.donut-seg:focus-visible {
+  filter: drop-shadow(0 0 4px var(--paper-text));
+}
+.legend li {
+  transition: background 160ms ease;
+  border-radius: var(--r-sm);
+}
+.legend li.on {
+  background: color-mix(in srgb, var(--paper-text) 8%, transparent);
+}
+.donut-center small {
+  max-width: 96px;
+  text-align: center;
+  line-height: 1.15;
+}
+.bars-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bar-col {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+.bar-col:focus-visible {
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+.bar-col .bar {
+  transform-origin: bottom;
+  animation: bar-grow 700ms var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+.bar-col:hover .bar {
+  filter: brightness(1.12);
+}
+.chart-tip {
+  margin: 0;
+  min-height: 1.4em;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--paper-text-2);
+}
+.year-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+.year-switch b {
+  min-width: 110px;
+  text-align: center;
+  font-size: var(--fs-lg);
+}
+.heat-scroll {
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+.heat {
+  display: block;
+  min-width: 720px;
+  max-width: 100%;
+  height: auto;
+}
+.heat-month {
+  font-size: 9px;
+  fill: var(--paper-text-2);
+  font-weight: 700;
+}
+.heat-cell {
+  transition: opacity 120ms ease;
+}
+.heat-cell.lv0,
+.heat-swatch.lv0 {
+  fill: color-mix(in srgb, var(--paper-text) 9%, transparent);
+  background: color-mix(in srgb, var(--paper-text) 9%, transparent);
+}
+.heat-cell.lv1,
+.heat-swatch.lv1 {
+  fill: color-mix(in srgb, var(--accent-strong) 28%, var(--paper));
+  background: color-mix(in srgb, var(--accent-strong) 28%, var(--paper));
+}
+.heat-cell.lv2,
+.heat-swatch.lv2 {
+  fill: color-mix(in srgb, var(--accent-strong) 50%, var(--paper));
+  background: color-mix(in srgb, var(--accent-strong) 50%, var(--paper));
+}
+.heat-cell.lv3,
+.heat-swatch.lv3 {
+  fill: color-mix(in srgb, var(--accent-strong) 75%, var(--paper));
+  background: color-mix(in srgb, var(--accent-strong) 75%, var(--paper));
+}
+.heat-cell.lv4,
+.heat-swatch.lv4 {
+  fill: var(--accent-strong);
+  background: var(--accent-strong);
+}
+.heat-cell.today {
+  stroke: var(--paper-text);
+  stroke-width: 1.6;
+}
+a:focus-visible .heat-cell,
+a:hover .heat-cell {
+  stroke: var(--paper-text);
+  stroke-width: 2;
+}
+.heat-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.heat-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--paper-text-2);
+}
+.heat-swatch {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+}
+.data-table {
+  margin-top: 10px;
+  font-size: var(--fs-sm);
+}
+.data-table summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--paper-text);
+  padding: 6px 0;
+}
+.data-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6px;
+  color: var(--paper-text);
+}
+.data-table th,
+.data-table td {
+  padding: 5px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--paper-line);
+}
+.cat-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cat-bar {
+  display: grid;
+  grid-template-columns: minmax(80px, 140px) 1fr auto 42px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  color: var(--paper-text);
+  font-size: var(--fs-sm);
+}
+.cat-bar:hover {
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+}
+.cb-name {
+  font-weight: 700;
+}
+.cb-track {
+  height: 10px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--paper-text) 10%, transparent);
+  overflow: hidden;
+}
+.cb-track i {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: var(--c);
+  transform-origin: left;
+  animation: meter-grow 800ms var(--ease) both;
+}
+.cat-bar small {
+  color: var(--paper-text-2);
+  text-align: right;
+}
+@media (max-width: 767px) {
+  .rings {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .ring {
+    padding: 12px 6px;
+  }
+  .ring-svg {
+    width: 76px;
+    height: 76px;
+  }
+  .ring-num {
+    font-size: 1rem;
+  }
+  .cat-bar {
+    grid-template-columns: minmax(70px, 100px) 1fr auto 38px;
+    gap: 8px;
+  }
+}
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 120ms;
+}

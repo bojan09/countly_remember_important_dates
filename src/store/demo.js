@@ -18,6 +18,8 @@ const UPCOMING = [
   { id: 'marathon', titleKey: 'demo.marathon', offset: 52, category: 'health', scene: 'runner' },
   { id: 'friendsWed', titleKey: 'demo.friendsWed', offset: 58, category: 'celebration', scene: 'wedding' },
   { id: 'grad', titleKey: 'demo.grad', offset: 80, category: 'celebration', scene: 'graduation' },
+  { id: 'deadline', titleKey: 'demo.deadline', offset: 9, category: 'work', scene: 'deadline' },
+  { id: 'winterHoliday', titleKey: 'demo.winterHoliday', offset: 60, category: 'celebration', scene: 'holiday' },
   { id: 'nye', titleKey: 'demo.nye', offset: 96, category: 'celebration', scene: 'fireworks' },
 ];
 

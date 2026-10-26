@@ -1,7 +1,7 @@
 import { h, segmented, emptyState } from '../components/ui.js';
 import { icon } from '../components/icons.js';
 import { pageHeader, bellButton, addEventButton } from '../components/chrome.js';
-import { eventCard, daysLabel, liveCountdown } from '../components/eventCard.js';
+import { eventCard, daysCounter, liveCountdown } from '../components/eventCard.js';
 import { miniCalendar } from '../components/miniCalendar.js';
 import { sceneSvg } from '../scenes/art.js';
 import { progress } from '../date/calendar.js';
@@ -104,7 +104,7 @@ function hero(ev, today) {
       'a',
       { href: `#/event/${encodeURIComponent(ev.id)}`, class: 'hero', 'aria-label': t('actions.open', { title }) },
       h('div', { class: 'art', html: sceneSvg(ev.scene, { variant: 'wide', mood: 'sunset', align: 'right' }) }),
-      h('div', { class: 'hero-body' }, h('div', { class: 'hero-title' }, title, ev.emoji ? ` ${ev.emoji}` : ''), h('div', { class: 'hero-days' }, daysLabel(ev, today)), h('div', { class: 'hero-date' }, formatDate(ev.date)), liveCountdown(ev, 'live-left hero-live')),
+      h('div', { class: 'hero-body' }, h('div', { class: 'hero-title' }, title, ev.emoji ? ` ${ev.emoji}` : ''), daysCounter(ev, today, 'hero-days'), h('div', { class: 'hero-date' }, formatDate(ev.date)), liveCountdown(ev, 'live-left hero-live')),
     ),
     prog
       ? h('div', null, h('div', { class: 'meter', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': String(prog.percent), 'aria-label': t('home.percentComplete', { percent: prog.percent }) }, h('i', { style: { width: `${prog.percent}%` } })), h('div', { class: 'meter-labels' }, h('span', null, t('home.percentComplete', { percent: prog.percent })), h('span', null, t('home.daysProgress', { elapsed: formatNumber(prog.elapsed), total: formatNumber(prog.total), unit: unit('day', prog.total) }))))

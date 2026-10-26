@@ -1,5 +1,11 @@
 # Changelog
 
+## Phase 3 — Living scenes and richer analytics (0.3.0)
+- Rolling countdown digits, one-time count-up of day totals and a confetti burst on the event day; all respect full / calm / off motion and system reduced motion.
+- Two new animated scenes (deadline, holiday) and matching sample events.
+- Stats rebuilt: Overview (KPIs, progress rings, category donut), Categories (donut + linked bars), Calendar (events per month, year heatmap, year switcher). Every chart has a text summary and a data-table fallback.
+- Pure analytics module with unit tests.
+
 ## Phase 2.1 — Navigation, density and calendar views (0.2.1)
 - Sidebar replaced by a sticky top navigation bar with accessible dropdown menus (Calendar views, Timeline filters, Explore, Preferences with language and theme). Mobile keeps the bottom bar.
 - Everything is calmer and less zoomed in: 14px base type, tighter cards, hero, KPI row and controls on desktop and mobile.

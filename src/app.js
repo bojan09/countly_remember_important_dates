@@ -7,6 +7,7 @@ import { h, openModal, toast } from './components/ui.js';
 import { icon, flagSvg } from './components/icons.js';
 import { initPwa, pwa } from './pwa.js';
 import { buildTopNav } from './components/navbar.js';
+import { motionFull } from './components/roll.js';
 
 const ROUTES = {
   '': { name: 'home', load: () => import('./views/home.js'), title: 'nav.home' },
@@ -56,7 +57,7 @@ function goBack() {
 
 function setPref(key, value, { silent = false } = {}) {
   storeSetPref(key, value);
-  if (key === 'theme' || key === 'accent' || key === 'reduceMotion') applyPrefs();
+  if (key === 'theme' || key === 'accent' || key === 'motion') applyPrefs();
   if (key === 'theme') toast(t('toast.theme'));
   if (key === 'accent') toast(t('toast.accent'));
   if (key === 'showSamples') toast(value ? t('toast.samplesShown') : t('toast.samplesHidden'));
@@ -224,6 +225,8 @@ async function renderRoute({ keepScroll = false, routeChange = false } = {}) {
     if (token !== renderToken) return; // a newer navigation superseded this one
     const el = mod.default(ctx, arg);
     viewHost.replaceChildren(el);
+    if (routeChange && motionFull()) el.classList.add('route-enter');
+    if (token !== renderToken) return;
     document.title = `${t(route.title)} — ${t('app.name')}`;
     watchScenes();
     if (routeChange) {

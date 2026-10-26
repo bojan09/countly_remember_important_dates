@@ -55,7 +55,7 @@ test('create → detail → persists across reload, with a live countdown', { sk
   const page = await openPage(ctx, { prefs: NO_SAMPLES });
   const shown = await createEvent(page, { title: 'Dentist', date: D(3), notes: 'Bring the card', location: 'Skopje' });
   assert.match(shown, /Dentist/);
-  assert.equal(await page.$eval('.d-days', (e) => e.textContent), '3 days');
+  await page.waitForFunction(() => document.querySelector('.d-days')?.textContent === '3 days', { timeout: 3000 }); // count-up settles
   assert.match(await page.$eval('.d-notes', (e) => e.textContent), /Bring the card/);
   assert.match(await page.$eval('.d-meta', (e) => e.textContent), /Skopje/);
   // seconds tick
