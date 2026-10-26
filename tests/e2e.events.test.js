@@ -281,7 +281,7 @@ test('photos are stored locally, survive reload and can be removed', { skip, tim
   const txt = join(mkdtempSync(join(tmpdir(), 'cly-')), 'a.txt');
   writeFileSync(txt, 'hello');
   await (await page.$('#photo-input')).uploadFile(txt);
-  await page.waitForFunction(() => [...document.querySelectorAll('.toast')].some((t) => /image file/.test(t.textContent)));
+  await page.waitForFunction(() => [...document.querySelectorAll('.toast')].some((t) => /JPEG, PNG, WebP, GIF or AVIF/.test(t.textContent)));
   await page.click('.thumb-del');
   await page.waitForFunction(() => !document.querySelector('.d-thumb.photo'));
   await page.close();

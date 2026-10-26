@@ -1,6 +1,6 @@
 // Countly service worker: precaches the app shell for offline use.
 // Bump VERSION whenever any precached file changes (tests/sw.test.js verifies the list is complete).
-const VERSION = 'countly-shell-v7';
+const VERSION = 'countly-shell-v8';
 
 const SHELL = [
   './',
@@ -17,6 +17,7 @@ const SHELL = [
   './src/pwa.js',
   './src/components/calendarGrid.js',
   './src/components/charts.js',
+  './src/components/photos.js',
   './src/components/roll.js',
   './src/components/chrome.js',
   './src/components/eventCard.js',

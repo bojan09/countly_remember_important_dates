@@ -1390,3 +1390,158 @@ a:hover .heat-cell {
     width: 100%;
   }
 }
+
+/* Memories: filter, year groups, notes and photos */
+.mem-filter {
+  max-width: 520px;
+  margin: 0 0 14px;
+}
+
+.mem-year {
+  margin: 0 0 22px;
+}
+
+.mem-year-h {
+  margin: 0 0 10px;
+  font-size: var(--fs-lg);
+  color: var(--text-2);
+}
+
+.mem-art {
+  position: relative;
+  overflow: hidden;
+}
+
+.mem-art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.mem-note {
+  margin-top: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+}
+
+.mem-photos {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+/* Photo thumbnails open the viewer */
+.thumb-open {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.thumb-open img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Photo viewer */
+.modal.lightbox {
+  width: min(92vw, 880px);
+  max-width: none;
+}
+
+.pv {
+  margin: 0;
+}
+
+.pv-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 200px;
+  max-height: 68vh;
+  border-radius: var(--r-md);
+  background: #000;
+  overflow: hidden;
+}
+
+.pv-img {
+  max-width: 100%;
+  max-height: 68vh;
+  object-fit: contain;
+  display: block;
+}
+
+.pv-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(20, 16, 50, 0.7);
+  color: #fff;
+}
+
+.pv-nav.prev {
+  left: 8px;
+}
+
+.pv-nav.next {
+  right: 8px;
+}
+
+.pv-nav:disabled {
+  opacity: 0.25;
+}
+
+.pv-cap {
+  margin-top: 8px;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  overflow-wrap: anywhere;
+}
+
+/* Memory note on the event page */
+.d-reflect {
+  margin-top: 18px;
+}
+
+.d-reflect h2 {
+  margin: 0 0 8px;
+}
+
+.d-reflect textarea {
+  width: 100%;
+  height: auto;
+  padding: 10px 14px;
+  resize: vertical;
+  font: inherit;
+}
+
+.d-reflect-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.d-reflect-foot [role='status'] {
+  flex: 1;
+}
+
+.d-reflect textarea {
+  background: var(--paper-2);
+  color: var(--paper-text);
+  border-color: var(--paper-line);
+}

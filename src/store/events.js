@@ -9,11 +9,11 @@
 import { getPrefs } from './prefs.js';
 import { buildSampleEvents } from './demo.js';
 import { openStorage } from './db.js';
-import { migrateRecord, validateEvent, newId, SCHEMA, SCENE_IDS } from '../events/model.js';
+import { migrateRecord, validateEvent, newId, SCHEMA, SCENE_IDS, LIMITS } from '../events/model.js';
 import { configureCategories, customCategories, categoryPrefs, allCategories, migrateCategory, validateCategory, newCategoryId, isKnownCategory } from '../events/categories.js';
 import { nextActive, prevActive, isRecurring, normalizeRule, nextOccurrence, occurrencesBetween } from '../date/recurrence.js';
 import { t } from '../i18n/index.js';
-import { buildBackup, planImport } from './backup.js';
+import { buildBackup, planImport, PHOTO_TYPES } from './backup.js';
 
 export const PHOTO_LIMITS = { maxBytes: 8 * 1024 * 1024, maxPerEvent: 12 };
 
@@ -145,6 +145,7 @@ function makeItem(s, date, { past, start, occ = false }) {
     recurring,
     title: ov.title || s.title,
     notes: ov.notes != null ? ov.notes : s.notes,
+    reflection: ov.reflection || '',
     description: s.description,
     emoji: s.emoji,
     location: s.location,
@@ -158,7 +159,7 @@ function makeItem(s, date, { past, start, occ = false }) {
     archived: s.archived,
     recurrence: s.recurrence,
     photos: (photoMeta.get(s.id) || []).length,
-    overridden: !!s.overrides[date],
+    overridden: !!(ov.title || ov.notes != null),
     createdAt: s.createdAt,
   };
 }
@@ -266,8 +267,10 @@ export async function saveEvent(input, id = null) {
   const rec = { skips: [], overrides: {}, archived: false, createdAt: now, ...(existing || {}), ...value, id: existing ? existing.id : newId(), schema: SCHEMA, updatedAt: now };
   if (existing && (existing.date !== value.date || JSON.stringify(existing.recurrence) !== JSON.stringify(value.recurrence))) {
     // The series definition moved: old per-occurrence exceptions no longer line up with it.
+    // A one-time event keeps its memory note when only its date changes.
+    const note = !isRecurring(existing.recurrence) && !isRecurring(value.recurrence) ? existing.overrides[existing.date]?.reflection : null;
     rec.skips = [];
-    rec.overrides = {};
+    rec.overrides = note ? { [value.date]: { reflection: note } } : {};
   }
   return { ok: true, event: await persist(rec) };
 }
@@ -341,7 +344,22 @@ export async function setOverride(id, date, override) {
   const clean = {};
   if (override && override.title && override.title.trim()) clean.title = override.title.trim().slice(0, 80);
   if (override && typeof override.notes === 'string' && override.notes.trim()) clean.notes = override.notes.trim().slice(0, 5000);
+  if (s.overrides[date]?.reflection) clean.reflection = s.overrides[date].reflection; // the memory note is edited separately
   if (Object.keys(clean).length) overrides[date] = clean;
+  else delete overrides[date];
+  return patch(id, { overrides });
+}
+
+/** Save (or clear, with empty text) the memory note of one occurrence. */
+export async function setReflection(id, date, text) {
+  const s = series.get(id);
+  if (!s) return null;
+  const cur = { ...(s.overrides[date] || {}) };
+  const clean = typeof text === 'string' ? text.trim().slice(0, LIMITS.reflection) : '';
+  if (clean) cur.reflection = clean;
+  else delete cur.reflection;
+  const overrides = { ...s.overrides };
+  if (Object.keys(cur).length) overrides[date] = cur;
   else delete overrides[date];
   return patch(id, { overrides });
 }
@@ -351,7 +369,7 @@ export const listPhotos = (eventId) => photoMeta.get(eventId) || [];
 
 export async function addPhoto(eventId, file) {
   if (!series.has(eventId)) throw new Error('notFound');
-  if (!file || !/^image\//.test(file.type || '')) throw new Error('photoType');
+  if (!file || !PHOTO_TYPES.includes(file.type)) throw new Error('photoType');
   if (file.size > PHOTO_LIMITS.maxBytes) throw new Error('photoSize');
   if (listPhotos(eventId).length >= PHOTO_LIMITS.maxPerEvent) throw new Error('photoCount');
   const rec = { id: newId().replace('ev-', 'ph-'), eventId, name: String(file.name || 'photo').slice(0, 120), type: file.type, size: file.size, blob: file, createdAt: Date.now() };

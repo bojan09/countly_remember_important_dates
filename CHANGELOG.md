@@ -1,5 +1,9 @@
 # Changelog
 
+## Phase 4.3 — Memory notes and photos
+- "How was it?" note per occurrence; Memories page with year groups, photo thumbnails, note snippets and photo/note filters.
+- Photos are downscaled on-device (1600px JPEG), restricted to formats a backup can carry, and open in a keyboard-friendly viewer with delete. Service worker cache v8.
+
 ## Phase 4.2 — Category manager
 - Create, edit, delete, hide and reorder categories (custom name, colour, icon and default picture); deleting moves events to a category you choose.
 - IndexedDB schema v2 (`categories` store); backups include custom categories. Service worker cache v7.

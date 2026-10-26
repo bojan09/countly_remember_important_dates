@@ -3,12 +3,14 @@ import { icon } from '../components/icons.js';
 import { sceneSvg } from '../scenes/art.js';
 import { progress } from '../date/calendar.js';
 import { categoryById } from '../events/categories.js';
+import { prepareImage, openPhotoViewer } from '../components/photos.js';
+import { LIMITS } from '../events/model.js';
 import { recurrenceSummary, timeLine } from '../events/format.js';
 import { t, formatDate, formatNumber, unit } from '../i18n/index.js';
 import { eventTitle, eventNotes } from '../store/demo.js';
 import { daysLabel, daysCounter, liveCountdown } from '../components/eventCard.js';
 import { celebrationBurst } from '../components/roll.js';
-import { getSeries, removeEvent, restoreRemoved, duplicateEvent, setArchived, setPinned, setSkipped, setOverride, listPhotos, addPhoto, getPhotoBlob, removePhoto } from '../store/events.js';
+import { getSeries, removeEvent, restoreRemoved, duplicateEvent, setArchived, setPinned, setSkipped, setOverride, setReflection, listPhotos, addPhoto, getPhotoBlob, removePhoto } from '../store/events.js';
 
 const PHOTO_SCENES = ['car', 'coast', 'birthday'];
 const failed = (err) => {
@@ -173,6 +175,7 @@ export default function renderDetail(ctx, id) {
     ),
     h('p', { class: 'd-soon' }, ev.sample ? t('detail.sampleReadOnly') : t('detail.soon')),
     h('section', { class: 'd-notes' }, h('h2', null, t('detail.notes')), h('p', null, notes || t('detail.noNotes'))),
+    mine && ev.date <= ctx.today ? reflectionSection(ev) : null,
     mine ? photoSection(ev) : ev.photos ? samplePhotos(ev) : null,
   );
 
@@ -190,7 +193,7 @@ function photoSection(ev) {
   liveUrls = [];
   const urls = liveUrls;
   const metas = listPhotos(ev.seriesId);
-  const input = h('input', { type: 'file', accept: 'image/*', class: 'sr-only', id: 'photo-input', tabindex: '-1' });
+  const input = h('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp,image/gif,image/avif', class: 'sr-only', id: 'photo-input', tabindex: '-1' });
   const thumbs = h('div', { class: 'd-thumbs' });
 
   input.addEventListener('change', async () => {
@@ -198,7 +201,7 @@ function photoSection(ev) {
     input.value = '';
     if (!file) return;
     try {
-      await addPhoto(ev.seriesId, file);
+      await addPhoto(ev.seriesId, await prepareImage(file));
       toast(t('detail.photoAdded'));
     } catch (err) {
       const known = ['photoType', 'photoSize', 'photoCount'];
@@ -210,16 +213,51 @@ function photoSection(ev) {
   const addBtn = h('button', { type: 'button', class: 'd-thumb add', 'aria-label': t('actions.addPhoto'), onclick: () => input.click(), html: icon('plus', { size: 26 }) });
   thumbs.append(addBtn);
 
-  metas.forEach(async (m) => {
+  const viewerItems = metas.map((m) => ({ id: m.id, name: m.name }));
+  const slots = metas.map(() => null);
+  metas.forEach(async (m, i) => {
     const blob = await getPhotoBlob(m.id).catch(() => null);
     if (!blob) return;
     const url = URL.createObjectURL(blob);
     urls.push(url);
-    const img = h('img', { src: url, alt: m.name, loading: 'lazy', decoding: 'async' });
+    const img = h('img', { src: url, alt: '', loading: 'lazy', decoding: 'async' });
+    const open = h('button', { type: 'button', class: 'thumb-open', 'aria-label': t('photos.open', { name: m.name }), onclick: () => openPhotoViewer({ photos: viewerItems, start: i, getBlob: getPhotoBlob, onDelete: (id) => removePhoto(ev.seriesId, id).then(() => toast(t('detail.photoRemoved'))) }) }, img);
     const del = h('button', { type: 'button', class: 'thumb-del', 'aria-label': `${t('actions.removePhoto')}: ${m.name}`, html: icon('x', { size: 14 }), onclick: () => removePhoto(ev.seriesId, m.id).then(() => toast(t('detail.photoRemoved')), failed) });
-    thumbs.insertBefore(h('span', { class: 'd-thumb photo' }, img, del), addBtn);
+    slots[i] = h('span', { class: 'd-thumb photo' }, open, del);
+    // keep stored order even though blobs resolve in any order
+    const after = slots.slice(i + 1).find(Boolean);
+    thumbs.insertBefore(slots[i], after || addBtn);
   });
 
   const section = h('section', { class: 'd-photos' }, h('h2', null, t('detail.photos', { count: metas.length })), thumbs, input, metas.length ? null : h('p', { class: 'muted small' }, t('detail.photosEmpty')));
   return section;
+}
+
+/** "How was it?": a short private note saved per occurrence (past or happening today). */
+function reflectionSection(ev) {
+  const area = h('textarea', { class: 'input', id: 'reflection', rows: '3', maxlength: String(LIMITS.reflection), placeholder: t('reflection.placeholder') });
+  area.value = ev.reflection || '';
+  const count = h('small', { class: 'muted', 'aria-hidden': 'true' });
+  const status = h('small', { class: 'muted', role: 'status' });
+  const save = h('button', { type: 'button', class: 'btn secondary small', disabled: true }, t('reflection.save'));
+  const sync = () => {
+    count.textContent = `${area.value.length}/${LIMITS.reflection}`;
+    save.disabled = area.value.trim() === (ev.reflection || '');
+  };
+  area.addEventListener('input', () => {
+    status.textContent = '';
+    sync();
+  });
+  save.addEventListener('click', async () => {
+    save.disabled = true;
+    try {
+      await setReflection(ev.seriesId, ev.date, area.value);
+      toast(t('reflection.saved')); // the store change re-renders this view, so an inline status would vanish
+    } catch {
+      status.textContent = t('toast.saveFailed');
+      save.disabled = false;
+    }
+  });
+  sync();
+  return h('section', { class: 'd-reflect' }, h('h2', null, h('label', { for: 'reflection' }, t('reflection.title'))), area, h('div', { class: 'd-reflect-foot' }, count, status, save));
 }

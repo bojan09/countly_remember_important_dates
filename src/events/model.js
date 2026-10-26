@@ -12,7 +12,7 @@ export const SCENE_FOR_CATEGORY = { celebration: 'birthday', travel: 'beach', wo
 /** Default scene for a category (built-in map, or the custom category's own choice). */
 export const sceneForCategory = (id) => SCENE_FOR_CATEGORY[id] || categoryById(id).scene || 'mountain';
 
-export const LIMITS = { title: 80, description: 200, notes: 5000, location: 120, emoji: 8, interval: 999 };
+export const LIMITS = { title: 80, description: 200, notes: 5000, location: 120, emoji: 8, interval: 999, reflection: 600 };
 
 const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const isoOrNull = (v) => (typeof v === 'string' && parseISODate(v) ? v : null);
@@ -123,6 +123,7 @@ export function migrateRecord(raw, known = null) {
       const clean = {};
       if (typeof o.title === 'string' && o.title.trim()) clean.title = o.title.trim().slice(0, LIMITS.title);
       if (typeof o.notes === 'string') clean.notes = o.notes.slice(0, LIMITS.notes);
+      if (typeof o.reflection === 'string' && o.reflection.trim()) clean.reflection = o.reflection.trim().slice(0, LIMITS.reflection);
       if (Object.keys(clean).length) overrides[d] = clean;
     }
   }
