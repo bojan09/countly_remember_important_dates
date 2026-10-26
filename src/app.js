@@ -5,8 +5,8 @@ import { tickLive } from './components/eventCard.js';
 import { getEvents, getEvent, initStore, onStoreChange, storeStatus } from './store/events.js';
 import { h, openModal, toast } from './components/ui.js';
 import { icon, flagSvg } from './components/icons.js';
-import { logoMark } from './components/logo.js';
 import { initPwa, pwa } from './pwa.js';
+import { buildTopNav } from './components/navbar.js';
 
 const ROUTES = {
   '': { name: 'home', load: () => import('./views/home.js'), title: 'nav.home' },
@@ -21,15 +21,6 @@ const ROUTES = {
   event: { name: 'event', load: () => import('./views/detail.js'), title: 'nav.home' },
 };
 
-const NAV = [
-  ['', 'home', 'nav.home'],
-  ['calendar', 'calendar', 'nav.calendar'],
-  ['timeline', 'timeline', 'nav.timeline'],
-  ['stats', 'stats', 'nav.stats'],
-  ['categories', 'categories', 'nav.categories'],
-  ['memories', 'memories', 'nav.memories'],
-  ['settings', 'settings', 'nav.settings'],
-];
 
 const app = document.getElementById('app');
 let viewHost = null;
@@ -89,35 +80,7 @@ function mountShell() {
 
   const skip = h('a', { class: 'skip-link', href: '#main', onclick: (e) => { e.preventDefault(); document.getElementById('main').focus(); } }, t('app.skip'));
 
-  const navLinks = NAV.map(([path, ic, label]) =>
-    h('a', { class: 'nav-link', href: `#/${path}`, 'data-route': ROUTES[path].name, 'aria-label': t(label) }, h('span', { html: icon(ic, { size: 22 }) }), h('span', { class: 'lbl' }, t(label))),
-  );
-
-  const langButtons = Object.entries(LANGS).map(([id, l]) =>
-    h('button', { type: 'button', class: 'lang-btn', lang: id, 'aria-pressed': String(getLang() === id), 'aria-label': l.label, onclick: () => changeLanguage(id) }, h('span', { html: flagSvg(id) }), h('span', { class: 'lbl' }, l.label)),
-  );
-
-  const themeToggle = h(
-    'div',
-    { class: 'theme-toggle', role: 'group', 'aria-label': t('settings.appearance') },
-    h('button', { type: 'button', 'data-theme-btn': 'light', 'aria-label': t('settings.light'), onclick: () => setPref('theme', 'light'), html: icon('sun', { size: 20 }) }),
-    h('button', { type: 'button', 'data-theme-btn': 'dark', 'aria-label': t('settings.dark'), onclick: () => setPref('theme', 'dark'), html: icon('moon', { size: 20 }) }),
-  );
-
-  const collapseBtn = h(
-    'button',
-    { type: 'button', class: 'collapse-btn', 'aria-label': t('actions.toggleSidebar'), onclick: () => { setPref('sidebarCollapsed', !getPrefs().sidebarCollapsed, { silent: true }); document.querySelector('.shell').classList.toggle('collapsed', getPrefs().sidebarCollapsed); } },
-    h('span', { html: icon('menu', { size: 20 }) }),
-    h('span', { class: 'lbl' }, t('actions.toggleSidebar').split(' ')[0]),
-  );
-
-  const sidebar = h(
-    'aside',
-    { class: 'sidebar' },
-    h('a', { class: 'brand', href: '#/', 'aria-label': `${t('app.name')} — ${t('nav.home')}` }, h('span', { html: logoMark(40) }), h('span', { class: 'brand-name' }, t('app.name'))),
-    h('nav', { class: 'nav', 'aria-label': t('nav.main') }, navLinks),
-    h('div', { class: 'side-foot' }, langButtons, themeToggle, collapseBtn),
-  );
+  const topnav = buildTopNav({ onLanguage: changeLanguage, onTheme: (id) => setPref('theme', id, { silent: true }), currentTheme: prefs.theme, onBell: openNotifications });
 
   viewHost = h('div', { class: 'main-inner', id: 'view' });
   const main = h('main', { class: 'main', id: 'main', tabindex: '-1' }, viewHost);
@@ -133,22 +96,28 @@ function mountShell() {
     h('button', { type: 'button', class: 'bn-link', 'data-route': 'more', 'aria-haspopup': 'dialog', onclick: openMore }, h('span', { html: icon('more', { size: 24 }) }), h('span', null, t('nav.more'))),
   );
 
-  const shell = h('div', { class: `shell${prefs.sidebarCollapsed ? ' collapsed' : ''}`, 'data-route': current.name }, sidebar, main, bottomNav);
+  const shell = h('div', { class: 'shell', 'data-route': current.name }, topnav, main, bottomNav);
   app.replaceChildren(skip, shell);
   syncThemeToggle();
   markActive();
 }
 
 function syncThemeToggle() {
-  const resolved = document.documentElement.dataset.theme;
-  document.querySelectorAll('[data-theme-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.themeBtn === resolved)));
+  const pref = getPrefs().theme;
+  document.querySelectorAll('[data-theme-btn]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.themeBtn === pref)));
 }
+
+const NAV_GROUP = { home: 'home', event: 'home', edit: 'home', new: 'home', calendar: 'calendar', timeline: 'timeline', stats: 'explore', categories: 'explore', memories: 'explore', settings: 'settings' };
 
 function markActive() {
   const shell = document.querySelector('.shell');
   if (shell) shell.dataset.route = current.name;
-  document.querySelectorAll('[data-route]').forEach((a) => {
-    if (a.classList.contains('shell')) return;
+  const group = NAV_GROUP[current.name];
+  document.querySelectorAll('[data-nav]').forEach((a) => {
+    if (a.dataset.nav === group) a.setAttribute('aria-current', 'page');
+    else a.removeAttribute('aria-current');
+  });
+  document.querySelectorAll('.bottom-nav [data-route]').forEach((a) => {
     const on = a.dataset.route === current.name || (['event', 'edit', 'new'].includes(current.name) && a.dataset.route === 'home') || (['timeline', 'categories', 'memories', 'settings'].includes(current.name) && a.dataset.route === 'more');
     if (on) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');

@@ -43,10 +43,11 @@ test('Macedonian UI also fits without overflow or errors on every viewport', { s
 
 test('language toggle switches the whole UI and persists across reload', { skip }, async () => {
   const page = await openPage(ctx, { viewport: VIEWPORTS['desktop-1440'] });
-  assert.equal(await page.$eval('.nav-link[data-route="calendar"] .lbl', (e) => e.textContent), 'Calendar');
-  await page.click('.lang-btn[lang="mk"]');
+  assert.equal(await page.$eval('.tn-link[data-nav="calendar"] .lbl', (e) => e.textContent), 'Calendar');
+  await page.click('.tn-pref');
+  await page.click('[data-lang-btn="mk"]');
   await page.waitForFunction(() => document.documentElement.lang === 'mk');
-  assert.equal(await page.$eval('.nav-link[data-route="calendar"] .lbl', (e) => e.textContent), 'Календар');
+  assert.equal(await page.$eval('.tn-link[data-nav="calendar"] .lbl', (e) => e.textContent), 'Календар');
   assert.match(await page.$eval('.hero-days', (e) => e.textContent), /дена/);
   assert.match(await page.$eval('h1', (e) => e.textContent), /[Ѐ-ӿ]/);
   await page.reload({ waitUntil: 'networkidle0' });
@@ -72,6 +73,7 @@ test('Macedonian dates, weekdays and plurals render in Cyrillic inside the real 
 test('theme toggle applies and persists (dark -> light)', { skip }, async () => {
   const page = await openPage(ctx, { viewport: VIEWPORTS['desktop-1440'], prefs: { theme: 'dark' } });
   assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark');
+  await page.click('.tn-pref');
   await page.click('[data-theme-btn="light"]');
   assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'light');
   const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
@@ -97,7 +99,7 @@ test('accent color changes the design token', { skip }, async () => {
 test('mobile navigation: bottom nav, FAB, More sheet and route changes work', { skip }, async () => {
   const page = await openPage(ctx, { viewport: VIEWPORTS['mobile-390'] });
   assert.ok(await page.$eval('.bottom-nav', (e) => getComputedStyle(e).display !== 'none'));
-  assert.ok(await page.$eval('.sidebar', (e) => getComputedStyle(e).display === 'none'));
+  assert.ok(await page.$eval('.topnav', (e) => getComputedStyle(e).display === 'none'));
   await page.click('.bottom-nav a[data-route="calendar"]');
   await page.waitForSelector('.view.calendar');
   await page.click('.bottom-nav button[data-route="more"]');
@@ -148,7 +150,7 @@ test('hiding samples shows the empty state, and showing them restores events', {
 test('calendar: month navigation, day selection and event dots are consistent', { skip }, async () => {
   const page = await openPage(ctx, { viewport: VIEWPORTS['desktop-1440'], route: '#/calendar' });
   const title1 = await page.$eval('.cal-title', (e) => e.textContent);
-  await page.click('.cal-bar .icon-btn:last-child');
+  await page.click(".cal-bar button[aria-label=\"Next month\"]");
   const title2 = await page.$eval('.cal-title', (e) => e.textContent);
   assert.notEqual(title1, title2);
   const dayWithDot = await page.$('.cal-day:not(.out) .dots i');
@@ -197,7 +199,7 @@ test('keyboard: skip link first, visible focus ring, Enter opens a card, dialog 
   await page.waitForSelector('.view.detail');
   await page.goBack();
   await page.waitForSelector('.view.home');
-  await page.click('.top-actions .icon-btn');
+  await page.click('.tn-actions button[aria-label="Notifications"]');
   await page.waitForSelector('dialog[open]');
   assert.ok(await page.evaluate(() => document.querySelector('dialog').contains(document.activeElement)), 'focus moved into dialog');
   await page.keyboard.press('Escape');

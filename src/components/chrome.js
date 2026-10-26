@@ -28,7 +28,6 @@ export function pageHeader(ctx, { title, sub, value }) {
     'header',
     { class: 'topbar' },
     h('div', null, h('h1', null, title), sub ? h('p', { class: 'sub' }, sub) : null),
-    h('div', { class: 'top-actions' }, searchBox(ctx, { value }), bellButton(ctx.openNotifications), addEventButton()),
   );
 }
 

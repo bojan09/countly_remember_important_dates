@@ -11,6 +11,7 @@ const P = {
   search: '<circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.5 15.5 5 5"/>',
   plus: '<path d="M12 4.5v15M4.5 12h15"/>',
   chevronLeft: '<path d="m14.5 5.5-6.5 6.5 6.5 6.5"/>',
+  chevronDown: '<path d="m5.5 9.5 6.5 6.5 6.5-6.5"/>',
   chevronRight: '<path d="m9.5 5.5 6.5 6.5-6.5 6.5"/>',
   chevronDown: '<path d="m5.5 9.5 6.5 6.5 6.5-6.5"/>',
   arrowRight: '<path d="M4.5 12h15M13 5.5l6.5 6.5-6.5 6.5"/>',

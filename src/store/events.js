@@ -10,7 +10,7 @@ import { getPrefs } from './prefs.js';
 import { buildSampleEvents } from './demo.js';
 import { openStorage } from './db.js';
 import { migrateRecord, validateEvent, newId, SCHEMA } from '../events/model.js';
-import { nextActive, prevActive, isRecurring, normalizeRule } from '../date/recurrence.js';
+import { nextActive, prevActive, isRecurring, normalizeRule, nextOccurrence, occurrencesBetween } from '../date/recurrence.js';
 import { t } from '../i18n/index.js';
 
 export const PHOTO_LIMITS = { maxBytes: 8 * 1024 * 1024, maxPerEvent: 12 };
@@ -114,11 +114,11 @@ export function onStoreChange(fn) {
 }
 
 /* ---------- derivation ---------- */
-function makeItem(s, date, { past, start }) {
+function makeItem(s, date, { past, start, occ = false }) {
   const ov = s.overrides[date] || {};
   const recurring = isRecurring(s.recurrence);
   return {
-    id: recurring && past ? `${s.id}@${date}` : s.id,
+    id: recurring && (past || occ) ? `${s.id}@${date}` : s.id,
     seriesId: s.id,
     userEvent: true,
     sample: false,
@@ -194,7 +194,34 @@ export function getEvent(id, today) {
   const s = series.get(sid);
   if (!s) return null;
   const items = deriveSeries(s, today);
-  return items.find((e) => e.id === id) || (id === sid ? items[0] : null) || null;
+  const found = items.find((e) => e.id === id) || (id === sid ? items[0] : null);
+  if (found) return found;
+  // Any other valid occurrence of a recurring series (e.g. one opened from the calendar).
+  const date = id.includes('@') ? id.split('@')[1] : null;
+  if (date && isRecurring(s.recurrence) && !s.skips.includes(date) && nextOccurrence(s.recurrence, s.date, date) === date) {
+    return makeItem(s, date, { past: date < today, start: null, occ: true });
+  }
+  return null;
+}
+
+/**
+ * Every occurrence (not just the next/last) inside [from, to], including sample events.
+ * Bounded: at most 400 occurrences per series. Used by Calendar views.
+ */
+export function getOccurrencesBetween(from, to, today) {
+  const out = samples(today).filter((e) => e.date >= from && e.date <= to);
+  for (const s of series.values()) {
+    if (s.archived) continue;
+    const rule = normalizeRule(s.recurrence);
+    if (rule.freq === 'none') {
+      if (s.date >= from && s.date <= to) out.push(makeItem(s, s.date, { past: s.date < today, start: s.start }));
+      continue;
+    }
+    for (const d of occurrencesBetween(rule, s.date, from, to, 400)) {
+      if (!s.skips.includes(d)) out.push(makeItem(s, d, { past: d < today, start: null, occ: true }));
+    }
+  }
+  return out;
 }
 
 /** Raw stored series (user events only). */

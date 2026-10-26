@@ -428,3 +428,238 @@ dd {
     flex: 1;
   }
 }
+
+/* ---------- Phase 2.1: calmer density ("zoomed out") ---------- */
+html {
+  font-size: 87.5%; /* 14px base: all rem type scales down ~12% */
+}
+:root {
+  --fs-2xl: 1.5rem;
+  --fs-hero: clamp(2rem, 4vw, 2.9rem);
+  --r-lg: 18px;
+  --r-xl: 22px;
+}
+.btn {
+  min-height: 42px;
+}
+.input {
+  height: 42px;
+}
+.kpis {
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.kpi {
+  padding: 12px 14px;
+  gap: 12px;
+}
+.kpi-ico {
+  width: 44px;
+  height: 44px;
+}
+.kpi-num {
+  font-size: 1.5rem;
+}
+.ecard {
+  min-height: 124px;
+  border-radius: 22px;
+}
+.ecard.tile {
+  min-height: 164px;
+}
+.hero,
+.home .hero-panel .hero {
+  min-height: 210px;
+}
+.tiles {
+  gap: 14px;
+}
+.feature {
+  gap: 14px;
+}
+.topbar {
+  margin-bottom: 16px;
+}
+.view.timeline .tl-card,
+.mem-card {
+  min-height: 0;
+}
+@media (max-width: 767px) {
+  .main {
+    padding-inline: 14px;
+  }
+  .cards {
+    gap: 12px;
+  }
+  .ecard {
+    min-height: 118px;
+    border-radius: 20px;
+  }
+  .btn {
+    min-height: 44px;
+  }
+  .input {
+    height: 44px;
+  }
+}
+
+/* ---------- Calendar: week / day / agenda ---------- */
+.cal-layout:not(.mode-month) {
+  grid-template-columns: minmax(0, 1fr);
+}
+.cal-bar {
+  gap: 8px;
+}
+.cal-bar .cal-title {
+  flex: 1;
+  text-align: center;
+  font-size: var(--fs-lg);
+}
+.cal-grid:not(.compact) .cal-day {
+  height: 52px;
+}
+.wk {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+.wk-day {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 200px;
+  padding: 8px;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+.wk-day.today {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.wk-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 2px 4px;
+  border-radius: var(--r-sm);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  text-align: left;
+}
+.wk-head:hover {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.wk-num {
+  font-size: var(--fs-lg);
+  color: var(--text);
+}
+.wk-day.today .wk-num {
+  color: var(--accent-text);
+}
+.wk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.wk-ev {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 8px;
+  border-radius: var(--r-sm);
+  border-left: 4px solid var(--c);
+  background: color-mix(in srgb, var(--c) 18%, var(--surface));
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.wk-ev small {
+  color: var(--text-2);
+  font-weight: 700;
+}
+.wk-ev:hover {
+  background: color-mix(in srgb, var(--c) 28%, var(--surface));
+}
+.wk-empty {
+  margin: auto;
+  color: var(--text-3);
+}
+.dv,
+.agenda {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+.dv-group .day-list {
+  margin: 0;
+}
+.dv-label {
+  margin: 0 0 8px;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.dv-label.today {
+  color: var(--accent-text);
+}
+.dv-empty {
+  padding: 28px 8px;
+  text-align: center;
+}
+.cal-body .day-item {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+.cal-body .link-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+.day-sheet .link-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  color: var(--paper-text);
+  font-weight: 700;
+  text-decoration: underline;
+}
+@media (max-width: 899px) {
+  .wk {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wk-day {
+    min-height: 0;
+    flex-direction: row;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .wk-head {
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 56px;
+  }
+  .wk-list {
+    flex: 1;
+    min-width: 0;
+  }
+  .wk-empty {
+    margin: 0;
+  }
+}
+.hero,
+.home .hero-panel .hero {
+  max-height: 232px;
+  min-height: 190px;
+}

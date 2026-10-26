@@ -21,6 +21,8 @@ const SORTS = {
 
 export default function renderTimeline(ctx) {
   const { today, events } = ctx;
+  const f = ctx.query.get('f');
+  if (['all', 'upcoming', 'past', 'archived'].includes(f)) state.filter = f;
   let query = (ctx.query.get('q') || '').trim();
 
   const list = h('ol', { class: 'tl' });

@@ -1,5 +1,12 @@
 # Changelog
 
+## Phase 2.1 — Navigation, density and calendar views (0.2.1)
+- Sidebar replaced by a sticky top navigation bar with accessible dropdown menus (Calendar views, Timeline filters, Explore, Preferences with language and theme). Mobile keeps the bottom bar.
+- Everything is calmer and less zoomed in: 14px base type, tighter cards, hero, KPI row and controls on desktop and mobile.
+- Calendar: working Month, Week, Day and Agenda views; recurring events appear in every period (not only their next occurrence); drill from a week day into the day view; add an event on a chosen day.
+- Timeline reads ?f= (all / upcoming / past / archived) from the menu.
+- docs/DATA_AND_SYNC.md: how data is stored today, what multi-device sync needs, and the recommended backend decision for the final phase.
+
 ## Phase 2 — Event management, date engine and persistence (0.2.0)
 - Create, edit, duplicate, favorite, archive and delete (with confirmation and Undo) your own events; samples stay read-only and can be copied.
 - Fields: title, emoji, date, all-day or time (+ optional IANA zone), start date, category, scene, location, description, notes, recurrence.

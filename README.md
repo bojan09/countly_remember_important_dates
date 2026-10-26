@@ -45,7 +45,7 @@ src/date/             calendar-day math (DST-safe)
 src/i18n/             en.js, mk.js, mk-dates.js, index.js
 src/store/            prefs, sample data, event source
 src/events/           categories, selectors
-src/components/       icons, ui kit, cards, calendar grid
+src/components/       icons, ui kit, top navbar, cards, calendar grid
 src/scenes/art.js     original SVG scene art
 src/views/            one module per screen (lazy loaded)
 src/styles/           tokens, base, layout, components, views
