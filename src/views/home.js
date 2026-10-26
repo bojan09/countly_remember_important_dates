@@ -7,7 +7,9 @@ import { sceneSvg } from '../scenes/art.js';
 import { progress } from '../date/calendar.js';
 import { upcoming, thisMonth, past, featuredEvent } from '../events/select.js';
 import { allCategories } from '../events/categories.js';
-import { t, getLang, greetingKey, formatDate, formatNumber, unit } from '../i18n/index.js';
+import { nextMilestone } from '../events/milestones.js';
+import { milestoneLabel } from '../components/milestone.js';
+import { t, getLang, greetingKey, formatDate, formatNumber, formatDays, unit } from '../i18n/index.js';
 import { eventTitle } from '../store/demo.js';
 import { logoMark } from '../components/logo.js';
 
@@ -96,6 +98,7 @@ function desktop(ctx, { up, month, pst }) {
 function hero(ev, today) {
   const prog = progress(ev.start, ev.date, today);
   const title = eventTitle(ev);
+  const nextMile = nextMilestone(ev, today);
   return h(
     'section',
     { class: 'panel hero-panel', 'aria-label': t('home.nextBig') },
@@ -106,6 +109,7 @@ function hero(ev, today) {
       h('div', { class: 'art', html: sceneSvg(ev.scene, { variant: 'wide', mood: 'sunset', align: 'right' }) }),
       h('div', { class: 'hero-body' }, h('div', { class: 'hero-title' }, title, ev.emoji ? ` ${ev.emoji}` : ''), daysCounter(ev, today, 'hero-days'), h('div', { class: 'hero-date' }, formatDate(ev.date)), liveCountdown(ev, 'live-left hero-live')),
     ),
+    nextMile ? h('p', { class: 'hero-mile' }, h('span', { 'aria-hidden': 'true', html: icon('sparkle', { size: 14 }) }), t('milestones.next', { label: milestoneLabel(nextMile), when: nextMile.state === 'today' ? t('milestones.today').toLowerCase() : t('milestones.in', { when: formatDays(nextMile.away) }) })) : null,
     prog
       ? h('div', null, h('div', { class: 'meter', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': String(prog.percent), 'aria-label': t('home.percentComplete', { percent: prog.percent }) }, h('i', { style: { width: `${prog.percent}%` } })), h('div', { class: 'meter-labels' }, h('span', null, t('home.percentComplete', { percent: prog.percent })), h('span', null, t('home.daysProgress', { elapsed: formatNumber(prog.elapsed), total: formatNumber(prog.total), unit: unit('day', prog.total) }))))
       : h('p', { class: 'meter-labels' }, t('home.noProgress')),

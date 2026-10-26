@@ -156,6 +156,8 @@ function makeItem(s, date, { past, start, occ = false }) {
     category: s.category,
     scene: s.scene,
     pinned: s.pinned,
+    milestones: s.milestones,
+    origin: s.date,
     archived: s.archived,
     recurrence: s.recurrence,
     photos: (photoMeta.get(s.id) || []).length,
@@ -312,6 +314,7 @@ export async function duplicateEvent(source) {
     description: '',
     notes: source.notes || '',
     pinned: false,
+    milestones: true,
     recurrence: { freq: 'none', interval: 1, until: null },
   };
   const res = await saveEvent({ ...src, title: t('detail.copyTitle', { title: src.title }).slice(0, 80), pinned: false });

@@ -36,6 +36,7 @@ export function emptyForm(todayISO) {
     description: '',
     notes: '',
     pinned: false,
+    milestones: true,
     recurrence: { freq: 'none', interval: 1, until: null },
   };
 }
@@ -98,6 +99,7 @@ export function validateEvent(input) {
     description: str(i.description, LIMITS.description),
     notes: typeof i.notes === 'string' ? i.notes.trim().slice(0, LIMITS.notes) : '',
     pinned: !!i.pinned,
+    milestones: i.milestones !== false,
     recurrence: freq === 'none' ? { freq: 'none', interval: 1, until: null } : { freq, interval: Number.isInteger(interval) ? Math.min(Math.max(interval, 1), LIMITS.interval) : 1, until: until && !errors.until ? until : null },
   };
   return { ok: Object.keys(errors).length === 0, errors, value };
@@ -142,6 +144,7 @@ export function migrateRecord(raw, known = null) {
     description: str(raw.description, LIMITS.description),
     notes: typeof raw.notes === 'string' ? raw.notes.slice(0, LIMITS.notes) : '',
     pinned: !!(raw.pinned ?? raw.favorite),
+    milestones: raw.milestones !== false,
     archived: !!raw.archived,
     recurrence: rule,
     skips,

@@ -1,5 +1,9 @@
 # Changelog
 
+## Phase 4.4 — Milestones (0.4.4)
+- Derived milestones ("100 days to go", "1 year since") on the event page and Home hero, with a per-event on/off switch; markers that never applied are left out.
+- `events/milestones.js` is reusable by reminders. Service worker cache v9.
+
 ## Phase 4.3 — Memory notes and photos
 - "How was it?" note per occurrence; Memories page with year groups, photo thumbnails, note snippets and photo/note filters.
 - Photos are downscaled on-device (1600px JPEG), restricted to formats a backup can carry, and open in a keyboard-friendly viewer with delete. Service worker cache v8.

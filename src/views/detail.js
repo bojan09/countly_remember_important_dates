@@ -4,9 +4,11 @@ import { sceneSvg } from '../scenes/art.js';
 import { progress } from '../date/calendar.js';
 import { categoryById } from '../events/categories.js';
 import { prepareImage, openPhotoViewer } from '../components/photos.js';
+import { milestonesFor, anniversaryYears } from '../events/milestones.js';
+import { milestoneLabel } from '../components/milestone.js';
 import { LIMITS } from '../events/model.js';
 import { recurrenceSummary, timeLine } from '../events/format.js';
-import { t, formatDate, formatNumber, unit } from '../i18n/index.js';
+import { t, formatDate, formatNumber, formatDays, unit } from '../i18n/index.js';
 import { eventTitle, eventNotes } from '../store/demo.js';
 import { daysLabel, daysCounter, liveCountdown } from '../components/eventCard.js';
 import { celebrationBurst } from '../components/roll.js';
@@ -174,6 +176,7 @@ export default function renderDetail(ctx, id) {
       action('more', t('actions.more'), { onclick: openMore, 'aria-haspopup': 'dialog' }),
     ),
     h('p', { class: 'd-soon' }, ev.sample ? t('detail.sampleReadOnly') : t('detail.soon')),
+    milestoneSection(ev, ctx.today),
     h('section', { class: 'd-notes' }, h('h2', null, t('detail.notes')), h('p', null, notes || t('detail.noNotes'))),
     mine && ev.date <= ctx.today ? reflectionSection(ev) : null,
     mine ? photoSection(ev) : ev.photos ? samplePhotos(ev) : null,
@@ -260,4 +263,36 @@ function reflectionSection(ev) {
   });
   sync();
   return h('section', { class: 'd-reflect' }, h('h2', null, h('label', { for: 'reflection' }, t('reflection.title'))), area, h('div', { class: 'd-reflect-foot' }, count, status, save));
+}
+
+/** Derived milestones: every "to go" marker for an upcoming event; recent and next "since" markers for a past one. */
+function milestoneSection(ev, today) {
+  let list = milestonesFor(ev, today);
+  if (ev.date <= today) {
+    const passed = list.filter((m) => m.state === 'passed').slice(-2);
+    const ahead = list.filter((m) => m.state !== 'passed').slice(0, 2);
+    list = [...passed, ...ahead];
+  }
+  const years = anniversaryYears(ev);
+  if (!list.length && !years) return null;
+  const nextId = (list.find((m) => m.state !== 'passed') || {}).id;
+  return h(
+    'section',
+    { class: 'd-miles' },
+    h('h2', null, t('milestones.title')),
+    years ? h('p', { class: 'd-anniv' }, t('milestones.anniversary', { count: years })) : null,
+    h(
+      'ul',
+      { class: 'ml-list' },
+      list.map((m) =>
+        h(
+          'li',
+          { class: `ml ${m.state}${m.id === nextId ? ' next' : ''}` },
+          h('span', { class: 'ml-ico', 'aria-hidden': 'true', html: icon(m.state === 'passed' ? 'check' : 'clock', { size: 16 }) }),
+          h('span', { class: 'ml-txt' }, h('b', null, milestoneLabel(m)), h('small', null, formatDate(m.date))),
+          h('span', { class: 'ml-when' }, m.state === 'passed' ? t('milestones.done') : m.state === 'today' ? t('milestones.today') : t('milestones.in', { when: formatDays(m.away) })),
+        ),
+      ),
+    ),
+  );
 }

@@ -30,7 +30,7 @@ Any static file host works (GitHub Pages, Netlify, Vercel, Cloudflare Pages): se
 
 ## Not yet built (later phases)
 
-Category manager, milestones, memory notes/photos (Phase 4), share image studio, reminders (Phase 5), final polish (Phase 6). Disabled controls say so ("Soon") instead of pretending to work.
+Share image studio, reminders (Phase 5), final polish (Phase 6). Disabled controls say so ("Soon") instead of pretending to work.
 
 ## Privacy and limits
 

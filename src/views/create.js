@@ -218,6 +218,9 @@ export default function renderCreate(ctx, id) {
   const pinLabel = h('span', { id: 'lbl-pinned' }, t('form.pinned'));
   const pinRow = h('div', { class: 'toggle-row field' }, h('div', { class: 'grow' }, pinLabel, h('small', { class: 'muted block' }, t('form.pinnedHelp'))), sw('f-pinned', !!data.pinned, 'lbl-pinned', (on) => (data.pinned = on)));
 
+  const mileLabel = h('span', { id: 'lbl-milestones' }, t('form.milestones'));
+  const mileRow = h('div', { class: 'toggle-row field' }, h('div', { class: 'grow' }, mileLabel, h('small', { class: 'muted block' }, t('form.milestonesHelp'))), sw('f-milestones', data.milestones !== false, 'lbl-milestones', (on) => (data.milestones = on)));
+
   /* ---------- submit ---------- */
   const summary = h('div', { class: 'form-summary', role: 'alert', tabindex: '-1', hidden: true });
   const saveBtn = h('button', { type: 'submit', class: 'btn primary' }, editing ? t('actions.saveChanges') : t('actions.save'));
@@ -240,6 +243,7 @@ export default function renderCreate(ctx, id) {
     descRow,
     notesRow,
     pinRow,
+    mileRow,
     h('p', { class: 'muted small' }, t('create.createdHelp')),
     h('div', { class: 'form-actions' }, cancel, saveBtn),
   );
