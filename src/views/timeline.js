@@ -23,6 +23,8 @@ export default function renderTimeline(ctx) {
   const { today, events } = ctx;
   const f = ctx.query.get('f');
   if (['all', 'upcoming', 'past', 'archived'].includes(f)) state.filter = f;
+  const cat = ctx.query.get('cat');
+  if (cat && ['celebration', 'travel', 'work', 'health', 'personal', 'other'].includes(cat)) state.cat = cat;
   let query = (ctx.query.get('q') || '').trim();
 
   const list = h('ol', { class: 'tl' });
@@ -150,7 +152,7 @@ export default function renderTimeline(ctx) {
           h(
             'a',
             { href: `#/event/${encodeURIComponent(e.id)}`, class: 'tl-card', 'aria-label': t('actions.open', { title: eventTitle(e) }) },
-            h('span', { class: 'tl-thumb', html: sceneSvg(e.scene, { variant: 'card', mood: 'day', align: 'right' }) }),
+            h('span', { class: 'tl-thumb', html: sceneSvg(e.scene, { variant: 'card', mood: 'day', align: 'right', animate: false }) }),
             h(
               'span',
               { class: 'tl-txt' },

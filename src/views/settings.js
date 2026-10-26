@@ -68,8 +68,20 @@ export default function renderSettings(ctx) {
   panel.append(
     h('h2', { class: 'set-h' }, t('settings.general')),
     h('div', { class: 'field' }, h('label', { for: 'set-name' }, t('settings.name')), nameInput, h('small', { class: 'muted' }, t('settings.nameHelp'))),
-    toggle('set-motion', t('settings.motion'), t('settings.motionHelp'), prefs.reduceMotion, (v) => ctx.setPref('reduceMotion', v)),
     toggle('set-samples', t('settings.samples'), t('settings.samplesHelp'), prefs.showSamples, (v) => ctx.setPref('showSamples', v)),
+  );
+
+  const systemReduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  panel.append(
+    h('h2', { class: 'set-h', id: 'set-motion-h' }, t('settings.motion')),
+    h(
+      'div',
+      { class: 'motion-opts', role: 'radiogroup', 'aria-labelledby': 'set-motion-h' },
+      [['full', 'sparkle'], ['calm', 'moon'], ['off', 'x']].map(([id, ic]) =>
+        h('button', { type: 'button', class: 'theme-opt', role: 'radio', 'data-motion-opt': id, 'aria-checked': String(prefs.motion === id), onclick: () => ctx.setPref('motion', id) }, h('span', { html: icon(ic, { size: 22 }) }), h('span', null, t(`settings.motionLevels.${id}`)), h('small', null, t(`settings.motionLevelHelp.${id}`))),
+      ),
+    ),
+    h('p', { class: 'muted small' }, systemReduced ? t('settings.motionSystemOn') : t('settings.motionHelp')),
   );
 
   // Rows

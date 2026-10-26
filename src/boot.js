@@ -13,7 +13,8 @@
       d.style.setProperty('--accent-ink', ink[p.accent] || '#1a0f3a');
       d.style.setProperty('--strong-mix', ink[p.accent] ? '#000' : '#fff');
     }
-    if (p.reduceMotion === true) d.dataset.motion = 'reduced';
+    var m = p.motion || (p.reduceMotion === true ? 'off' : 'full');
+    d.dataset.motion = m === 'off' ? 'reduced' : m === 'calm' ? 'calm' : 'full';
   } catch (e) {
     /* defaults apply */
   }

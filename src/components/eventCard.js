@@ -3,13 +3,14 @@ import { icon } from './icons.js';
 import { sceneSvg } from '../scenes/art.js';
 import { countdown, progress } from '../date/calendar.js';
 import { eventInstantMs, splitDuration } from '../date/instant.js';
+import { setRolling, countUp } from './roll.js';
 import { t, unit, formatDays, formatNumber, formatDate } from '../i18n/index.js';
 import { eventTitle } from '../store/demo.js';
 
 // Text tone per scene so copy stays readable on the art underneath.
 const TONE = {
-  wide: { birthday: 'dark', beach: 'dark', tooth: 'dark', car: 'light', coast: 'light', laptop: 'light', mountain: 'dark', concert: 'light', house: 'dark', runner: 'dark', graduation: 'light', rocket: 'light', wedding: 'dark', fireworks: 'light' },
-  tile: { birthday: 'dark', beach: 'light', tooth: 'dark', car: 'light', coast: 'light', laptop: 'light', mountain: 'dark', concert: 'light', house: 'dark', runner: 'dark', graduation: 'light', rocket: 'light', wedding: 'dark', fireworks: 'light' },
+  wide: { birthday: 'dark', beach: 'dark', tooth: 'dark', car: 'light', coast: 'light', laptop: 'light', mountain: 'dark', concert: 'light', house: 'dark', runner: 'dark', graduation: 'light', rocket: 'light', wedding: 'dark', fireworks: 'light', deadline: 'light', holiday: 'light' },
+  tile: { birthday: 'dark', beach: 'light', tooth: 'dark', car: 'light', coast: 'light', laptop: 'light', mountain: 'dark', concert: 'light', house: 'dark', runner: 'dark', graduation: 'light', rocket: 'light', wedding: 'dark', fireworks: 'light', deadline: 'light', holiday: 'light' },
 };
 
 export function daysLabel(ev, today) {
@@ -39,7 +40,7 @@ function paintLive(node) {
   const v = splitDuration(ms);
   const params = { d: formatNumber(v.d), h: v.h, m: v.m, s: v.s };
   const withSec = node.getAttribute('data-live-sec') === '1';
-  node.textContent = t(withSec ? 'rel.timeLeftSec' : 'rel.timeLeft', params);
+  setRolling(node, t(withSec ? 'rel.timeLeftSec' : 'rel.timeLeft', params));
   const minuteKey = `${v.d}.${v.h}.${v.m}`;
   if (node.dataset.minuteKey !== minuteKey) {
     node.dataset.minuteKey = minuteKey; // screen readers get a fresh label once a minute, not every second
@@ -49,6 +50,15 @@ function paintLive(node) {
 
 export function tickLive() {
   document.querySelectorAll('[data-live-ts]').forEach(paintLive);
+}
+
+/** "42 days" that counts up from 0 the first time it is shown (once per event per session). */
+export function daysCounter(ev, today, cls) {
+  const el = h('div', { class: cls });
+  const cd = countdown(ev.date, today);
+  if (cd.state === 'upcoming') countUp(el, cd.days, formatDays, `${ev.id}|${ev.date}`);
+  else el.textContent = daysLabel(ev, today);
+  return el;
 }
 
 /** variant: 'wide' (mobile gallery) | 'tile' (desktop row) */

@@ -159,7 +159,7 @@ export default function renderCreate(ctx, id) {
           data.scene = s;
           sceneTouched = true;
         });
-        return h('label', { class: 'scene-opt' }, radio, h('span', { class: 'scene-thumb', html: sceneSvg(s, { variant: 'card', mood: 'day', align: 'right' }) }), h('span', { class: 'sr-only' }, t(`scene.${s}`)));
+        return h('label', { class: 'scene-opt' }, radio, h('span', { class: 'scene-thumb', html: sceneSvg(s, { variant: 'card', mood: 'day', align: 'right', animate: false }) }), h('span', { class: 'sr-only' }, t(`scene.${s}`)));
       }),
     ),
   );
