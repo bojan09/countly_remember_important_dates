@@ -30,7 +30,7 @@ Any static file host works (GitHub Pages, Netlify, Vercel, Cloudflare Pages): se
 
 ## Not yet built (later phases)
 
-Share image studio, reminders (Phase 5), final polish (Phase 6). Disabled controls say so ("Soon") instead of pretending to work.
+Final polish, performance and UI/UX pass (Phase 6), then the sync/backend decision. Reminders only fire while the app is open; use the calendar (.ics) export for alerts that always arrive ([docs/REMINDERS.md](docs/REMINDERS.md)). Disabled controls say so ("Soon") instead of pretending to work.
 
 ## Privacy and limits
 

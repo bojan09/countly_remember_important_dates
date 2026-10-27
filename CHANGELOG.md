@@ -1,5 +1,10 @@
 # Changelog
 
+## Phase 5 — Reminders, calendar export and share images (0.5.0)
+- Per-event reminders with a bell inbox, unread dot and optional system notifications; honest limits documented in docs/REMINDERS.md.
+- .ics export (one event or all) with repeats, skips and alarms.
+- Share image studio: Story / Square / Wide PNGs in Night, Day or Vivid, drawn on-device. Service worker cache v11.
+
 ## Phase 4.4 — Milestones (0.4.4)
 - Derived milestones ("100 days to go", "1 year since") on the event page and Home hero, with a per-event on/off switch; markers that never applied are left out.
 - `events/milestones.js` is reusable by reminders. Service worker cache v9.

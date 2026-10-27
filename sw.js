@@ -1,6 +1,6 @@
 // Countly service worker: precaches the app shell for offline use.
 // Bump VERSION whenever any precached file changes (tests/sw.test.js verifies the list is complete).
-const VERSION = 'countly-shell-v9';
+const VERSION = 'countly-shell-v11';
 
 const SHELL = [
   './',
@@ -19,7 +19,9 @@ const SHELL = [
   './src/components/charts.js',
   './src/components/milestone.js',
   './src/components/photos.js',
+  './src/components/reminders.js',
   './src/components/roll.js',
+  './src/components/shareStudio.js',
   './src/components/chrome.js',
   './src/components/eventCard.js',
   './src/components/icons.js',
@@ -31,7 +33,10 @@ const SHELL = [
   './src/date/instant.js',
   './src/date/recurrence.js',
   './src/events/analytics.js',
+  './src/events/ics.js',
   './src/events/milestones.js',
+  './src/events/reminders.js',
+  './src/events/shareCard.js',
   './src/events/categories.js',
   './src/events/format.js',
   './src/events/model.js',
@@ -75,6 +80,25 @@ self.addEventListener('activate', (event) => {
       await Promise.all(keys.filter((k) => k.startsWith('countly-') && k !== VERSION).map((k) => caches.delete(k)));
       await self.clients.claim();
     })(),
+  );
+});
+
+// Tapping a reminder notification opens (or focuses) the app on that event.
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const hash = (event.notification.data && event.notification.data.hash) || '#/';
+  const target = new URL(self.registration.scope);
+  target.hash = hash.replace(/^#/, '');
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const c of list) {
+        if ('focus' in c) {
+          if ('navigate' in c) c.navigate(target.href).catch(() => {});
+          return c.focus();
+        }
+      }
+      return self.clients.openWindow(target.href);
+    }),
   );
 });
 

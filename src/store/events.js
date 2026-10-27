@@ -14,6 +14,7 @@ import { configureCategories, customCategories, categoryPrefs, allCategories, mi
 import { nextActive, prevActive, isRecurring, normalizeRule, nextOccurrence, occurrencesBetween } from '../date/recurrence.js';
 import { t } from '../i18n/index.js';
 import { buildBackup, planImport, PHOTO_TYPES } from './backup.js';
+import { sanitizeReminders } from '../events/reminders.js';
 
 export const PHOTO_LIMITS = { maxBytes: 8 * 1024 * 1024, maxPerEvent: 12 };
 
@@ -157,6 +158,7 @@ function makeItem(s, date, { past, start, occ = false }) {
     scene: s.scene,
     pinned: s.pinned,
     milestones: s.milestones,
+    reminders: s.reminders,
     origin: s.date,
     archived: s.archived,
     recurrence: s.recurrence,
@@ -315,6 +317,7 @@ export async function duplicateEvent(source) {
     notes: source.notes || '',
     pinned: false,
     milestones: true,
+    reminders: [],
     recurrence: { freq: 'none', interval: 1, until: null },
   };
   const res = await saveEvent({ ...src, title: t('detail.copyTitle', { title: src.title }).slice(0, 80), pinned: false });
@@ -325,6 +328,15 @@ async function patch(id, fields) {
   const s = series.get(id);
   if (!s) return null;
   return persist({ ...s, ...fields, updatedAt: Date.now() });
+}
+
+/** Stored series records (for calendar export). */
+export const listSeries = () => [...series.values()];
+
+export async function setReminders(id, list) {
+  const s = series.get(id);
+  if (!s) return null;
+  return patch(id, { reminders: sanitizeReminders(list, s) });
 }
 
 export const setArchived = (id, archived) => patch(id, { archived: !!archived });

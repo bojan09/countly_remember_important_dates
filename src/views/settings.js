@@ -4,8 +4,9 @@ import { pageHeader, mobilePageHead } from '../components/chrome.js';
 import { ACCENTS } from '../store/prefs.js';
 import { LANGS, t, getLang, formatDate } from '../i18n/index.js';
 import { runExport, pickAndImport } from './backupFlow.js';
+import { openNotificationSettings, exportAllToCalendar } from '../components/reminders.js';
 
-const SOON_ROWS = [['notifications', 'bell']];
+const SOON_ROWS = [];
 
 function formatBytes(n) {
   if (n < 1024) return `${n} B`;
@@ -88,6 +89,8 @@ export default function renderSettings(ctx) {
   const last = prefs.lastBackup ? t('backup.last', { date: formatDate(new Date(prefs.lastBackup).toISOString().slice(0, 10)) }) : t('backup.never');
   const dataRow = (ic, label, sub, onclick) => h('li', null, h('button', { type: 'button', class: 'row', onclick }, h('span', { class: 'row-ico', html: icon(ic, { size: 22 }) }), h('span', { class: 'grow' }, h('span', { class: 'row-title' }, label), sub ? h('small', { class: 'row-sub muted' }, sub) : null), h('span', { html: icon('chevronRight', { size: 20 }) })));
   list.append(
+    dataRow('bell', t('settings.notifications'), t('reminders.settingsHelp'), () => openNotificationSettings()),
+    dataRow('calendar', t('reminders.exportAll'), t('reminders.exportAllHelp'), () => exportAllToCalendar()),
     dataRow('upload', t('settings.exportData'), last, () => runExport(ctx)),
     dataRow('download', t('settings.importData'), t('backup.importHelp'), () => pickAndImport(ctx)),
     h('li', null, h('button', { type: 'button', class: 'row', onclick: () => showPwa(ctx) }, h('span', { class: 'row-ico', html: icon('wifiOff', { size: 22 }) }), h('span', { class: 'grow' }, t('settings.pwa')), h('span', { html: icon('chevronRight', { size: 20 }) }))),

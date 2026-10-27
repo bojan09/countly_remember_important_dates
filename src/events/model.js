@@ -4,6 +4,7 @@ import { parseISODate } from '../date/calendar.js';
 import { normalizeRule, FREQS } from '../date/recurrence.js';
 import { isValidTime, isValidTimeZone } from '../date/instant.js';
 import { isKnownCategory, categoryById } from './categories.js';
+import { sanitizeReminders } from './reminders.js';
 
 export const SCHEMA = 1;
 
@@ -37,6 +38,7 @@ export function emptyForm(todayISO) {
     notes: '',
     pinned: false,
     milestones: true,
+    reminders: [],
     recurrence: { freq: 'none', interval: 1, until: null },
   };
 }
@@ -100,6 +102,7 @@ export function validateEvent(input) {
     notes: typeof i.notes === 'string' ? i.notes.trim().slice(0, LIMITS.notes) : '',
     pinned: !!i.pinned,
     milestones: i.milestones !== false,
+    reminders: sanitizeReminders(i.reminders, { time }),
     recurrence: freq === 'none' ? { freq: 'none', interval: 1, until: null } : { freq, interval: Number.isInteger(interval) ? Math.min(Math.max(interval, 1), LIMITS.interval) : 1, until: until && !errors.until ? until : null },
   };
   return { ok: Object.keys(errors).length === 0, errors, value };
@@ -145,6 +148,7 @@ export function migrateRecord(raw, known = null) {
     notes: typeof raw.notes === 'string' ? raw.notes.slice(0, LIMITS.notes) : '',
     pinned: !!(raw.pinned ?? raw.favorite),
     milestones: raw.milestones !== false,
+    reminders: sanitizeReminders(raw.reminders, { time: isValidTime(raw.time) ? raw.time : null }),
     archived: !!raw.archived,
     recurrence: rule,
     skips,

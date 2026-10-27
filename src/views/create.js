@@ -4,6 +4,7 @@ import { sceneSvg } from '../scenes/art.js';
 import { t, unit } from '../i18n/index.js';
 import { emptyForm, validateEvent, SCENE_IDS, sceneForCategory, LIMITS } from '../events/model.js';
 import { visibleCategories, categoryName } from '../events/categories.js';
+import { reminderPicker } from '../components/reminders.js';
 import { FREQS } from '../date/recurrence.js';
 import { parseISODate } from '../date/calendar.js';
 import { getSeries, saveEvent } from '../store/events.js';
@@ -113,6 +114,7 @@ export default function renderCreate(ctx, id) {
   timeEl.addEventListener('input', () => {
     data.time = timeEl.value || null;
     if (!data.time) data.tz = null;
+    picker.setTime(data.time);
   });
   const zones = timeZones();
   const tzEl = select('tz', [['', t('form.tzLocal')], ...zones.map((z) => [z, z.replace(/_/g, ' ')])], data.tz || '', (v) => (data.tz = v || null));
@@ -131,6 +133,7 @@ export default function renderCreate(ctx, id) {
       timeEl.value = '09:00';
       data.time = '09:00';
     }
+    picker.setTime(data.time);
   });
   timedBox.hidden = !data.time;
   const allDayRow = h('div', { class: 'toggle-row field' }, h('div', { class: 'grow' }, allDayLabel), allDaySwitch);
@@ -221,6 +224,9 @@ export default function renderCreate(ctx, id) {
   const mileLabel = h('span', { id: 'lbl-milestones' }, t('form.milestones'));
   const mileRow = h('div', { class: 'toggle-row field' }, h('div', { class: 'grow' }, mileLabel, h('small', { class: 'muted block' }, t('form.milestonesHelp'))), sw('f-milestones', data.milestones !== false, 'lbl-milestones', (on) => (data.milestones = on)));
 
+  const picker = reminderPicker({ selected: data.reminders || [], time: data.time, onChange: (list) => (data.reminders = list) });
+  const remindRow = h('fieldset', { class: 'field rm-field' }, h('legend', { class: 'lbl', id: 'rm-legend' }, t('reminders.title')), h('small', { class: 'muted block' }, t('reminders.formHelp')), picker.node);
+
   /* ---------- submit ---------- */
   const summary = h('div', { class: 'form-summary', role: 'alert', tabindex: '-1', hidden: true });
   const saveBtn = h('button', { type: 'submit', class: 'btn primary' }, editing ? t('actions.saveChanges') : t('actions.save'));
@@ -244,6 +250,7 @@ export default function renderCreate(ctx, id) {
     notesRow,
     pinRow,
     mileRow,
+    remindRow,
     h('p', { class: 'muted small' }, t('create.createdHelp')),
     h('div', { class: 'form-actions' }, cancel, saveBtn),
   );

@@ -13,7 +13,7 @@ export function addEventButton({ compact = false } = {}) {
 }
 
 export function bellButton(onClick) {
-  return h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('actions.notifications'), onclick: onClick, html: icon('bell', { size: 22 }) });
+  return h('button', { type: 'button', class: 'icon-btn', 'data-bell': '', 'aria-label': t('actions.notifications'), onclick: onClick, html: icon('bell', { size: 22 }) });
 }
 
 export function searchBox(ctx, { value = '' } = {}) {

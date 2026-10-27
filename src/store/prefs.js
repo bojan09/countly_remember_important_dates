@@ -34,6 +34,8 @@ export const DEFAULT_PREFS = Object.freeze({
   onboarded: false,
   sidebarCollapsed: false,
   lastBackup: null, // epoch ms of the last exported backup
+  reminderCheck: null, // epoch ms the reminder scheduler last looked
+  remindersCleared: null, // epoch ms the bell inbox was last marked read
 });
 
 let prefs = { ...DEFAULT_PREFS };
@@ -61,7 +63,9 @@ export function sanitizePrefs(input) {
     if (typeof input[k] === 'boolean') out[k] = input[k];
   }
   if (typeof input.name === 'string') out.name = input.name.slice(0, 40);
-  if (Number.isFinite(input.lastBackup) && input.lastBackup > 0) out.lastBackup = input.lastBackup;
+  for (const k of ['lastBackup', 'reminderCheck', 'remindersCleared']) {
+    if (Number.isFinite(input[k]) && input[k] > 0) out[k] = input[k];
+  }
   return out;
 }
 

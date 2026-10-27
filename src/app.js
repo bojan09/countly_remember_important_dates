@@ -8,6 +8,7 @@ import { icon, flagSvg } from './components/icons.js';
 import { initPwa, pwa } from './pwa.js';
 import { buildTopNav } from './components/navbar.js';
 import { motionFull } from './components/roll.js';
+import { startReminders, inboxItems, paintBell, openNotificationsDialog } from './components/reminders.js';
 
 const ROUTES = {
   '': { name: 'home', load: () => import('./views/home.js'), title: 'nav.home' },
@@ -141,12 +142,11 @@ function openMore() {
   modal = openModal({ title: t('nav.moreMenu'), content: list, variant: 'sheet' });
 }
 
+const reminderItems = () => getEvents(todayISO());
+const refreshBell = () => paintBell(inboxItems(reminderItems(), getPrefs()).length);
+
 function openNotifications() {
-  openModal({
-    title: t('notify.title'),
-    content: h('div', { class: 'notify-empty' }, h('p', { class: 'empty-title' }, t('notify.emptyTitle')), h('p', null, t('notify.body'))),
-    actions: [{ label: t('actions.gotIt') }],
-  });
+  openNotificationsDialog({ getItems: reminderItems, getPrefs, save: storeSetPref, onRead: refreshBell, navigate: (hash) => (location.hash = hash) });
 }
 
 /* ---------- onboarding ---------- */
@@ -225,6 +225,7 @@ async function renderRoute({ keepScroll = false, routeChange = false } = {}) {
     if (token !== renderToken) return; // a newer navigation superseded this one
     const el = mod.default(ctx, arg);
     viewHost.replaceChildren(el);
+    refreshBell();
     if (routeChange && motionFull()) el.classList.add('route-enter');
     if (token !== renderToken) return;
     document.title = `${t(route.title)} — ${t('app.name')}`;
@@ -304,6 +305,7 @@ async function boot() {
     renderRoute({ routeChange: true });
   });
   renderRoute();
+  startReminders({ getItems: reminderItems, getPrefs, save: storeSetPref, onChange: refreshBell });
   initPwa();
   if (!prefs.onboarded) showOnboarding();
   if (!storeStatus.persistent) toast(t('toast.storageMemory'), { timeout: 8000 });

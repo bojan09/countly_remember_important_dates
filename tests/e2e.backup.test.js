@@ -67,14 +67,12 @@ test('merge import restores a deleted event and is idempotent', { skip, timeout:
   });
   assert.deepEqual(await titles(page), []);
   await pickFile(page, file);
-  await page.waitForSelector('dialog[open] .bk-plan');
-  assert.match(await page.$eval('.bk-plan', (e) => e.textContent), /New: 1/);
+  await page.waitForFunction(() => /New: 1/.test(document.querySelector('dialog[open] .bk-plan')?.textContent || ''), { timeout: 10000 });
   await page.evaluate(() => [...document.querySelectorAll('dialog .btn')].find((b) => b.textContent === 'Import').click());
   await page.waitForFunction(() => /Imported: 1 new/.test(document.querySelector('.toast-host')?.textContent || ''), { timeout: 5000 });
   assert.deepEqual(await titles(page), ['Round trip']);
   await pickFile(page, file);
-  await page.waitForSelector('dialog[open] .bk-plan');
-  assert.match(await page.$eval('.bk-plan', (e) => e.textContent), /New: 0 · Updated: 0 · Already up to date: 1/);
+  await page.waitForFunction(() => /New: 0 · Updated: 0 · Already up to date: 1/.test(document.querySelector('dialog[open] .bk-plan')?.textContent || ''), { timeout: 10000 });
   await page.close();
 });
 

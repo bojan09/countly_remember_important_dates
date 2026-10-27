@@ -5,6 +5,8 @@ import { progress } from '../date/calendar.js';
 import { categoryById } from '../events/categories.js';
 import { prepareImage, openPhotoViewer } from '../components/photos.js';
 import { milestonesFor, anniversaryYears } from '../events/milestones.js';
+import { openReminderDialog } from '../components/reminders.js';
+import { openShareStudio } from '../components/shareStudio.js';
 import { milestoneLabel } from '../components/milestone.js';
 import { LIMITS } from '../events/model.js';
 import { recurrenceSummary, timeLine } from '../events/format.js';
@@ -170,8 +172,8 @@ export default function renderDetail(ctx, id) {
     h(
       'div',
       { class: 'd-acts' },
-      action('bell', t('actions.reminder')),
-      action('share', t('actions.share')),
+      action('bell', t('actions.reminder'), { onclick: () => openReminderDialog(ev, ctx) }),
+      action('share', t('actions.share'), { onclick: () => openShareStudio(ev, ctx) }),
       mine ? action('pencil', t('actions.edit'), { onclick: () => ctx.navigate(editHref) }) : action('copy', t('actions.makeCopy'), { onclick: doDuplicate }),
       action('more', t('actions.more'), { onclick: openMore, 'aria-haspopup': 'dialog' }),
     ),

@@ -163,7 +163,7 @@ export function buildTopNav({ onLanguage, onTheme, currentTheme, onBell }) {
         { class: 'tn-actions' },
         search,
         h('a', { href: '#/timeline', class: 'icon-btn tn-search-ico', 'aria-label': t('actions.searchLabel'), html: icon('search', { size: 22 }) }),
-        h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('actions.notifications'), onclick: onBell, html: icon('bell', { size: 22 }) }),
+        h('button', { type: 'button', class: 'icon-btn', 'data-bell': '', 'aria-label': t('actions.notifications'), onclick: onBell, html: icon('bell', { size: 22 }) }),
         h('a', { href: '#/new', class: 'btn primary tn-add' }, h('span', { html: icon('plus', { size: 18 }) }), h('span', { class: 'lbl' }, t('actions.addEvent'))),
         h('div', { class: 'tn-item' }, prefBtn, prefMenu),
       ),
