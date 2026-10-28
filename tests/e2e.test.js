@@ -129,7 +129,7 @@ test('opening a card shows the real event detail with computed progress and samp
   const page = await openPage(ctx, { viewport: VIEWPORTS['mobile-390'] });
   await page.click('.m-home .ecard[href="#/event/sample-vacation"]');
   await page.waitForSelector('.view.detail .d-title');
-  assert.match(await page.$eval('.d-days', (e) => e.textContent), /^42 days$/);
+  await page.waitForFunction(() => document.querySelector('.d-days').textContent === '42 days'); // the figure counts up on first view
   assert.equal(await page.$eval('.d-meter', (e) => e.getAttribute('aria-valuenow')), '65');
   assert.ok(await page.$('.badge-sample'));
   await page.click('.d-top .icon-btn');
@@ -164,13 +164,16 @@ test('calendar: month navigation, day selection and event dots are consistent', 
 
 test('timeline filter and search work', { skip }, async () => {
   const page = await openPage(ctx, { viewport: VIEWPORTS['desktop-1440'], route: '#/timeline' });
-  assert.equal(await page.$$eval('.tl-item', (e) => e.length), 43);
+  assert.equal(await page.$$eval('.tl-item', (e) => e.length), 30, 'long lists show a first chunk');
+  assert.match(await page.$eval('.tl-count', (e) => e.textContent), /43/);
+  await page.click('.more-btn');
+  await page.waitForFunction(() => document.querySelectorAll('.tl-item').length === 43);
   await page.click('.seg-btn[data-id="upcoming"]');
   assert.equal(await page.$$eval('.tl-item', (e) => e.length), 17);
   await page.type('.tl-search input', 'croatia');
-  assert.equal(await page.$$eval('.tl-item', (e) => e.length), 1);
+  await page.waitForFunction(() => document.querySelectorAll('.tl-item').length === 1); // search is debounced
   await page.type('.tl-search input', 'zzzz');
-  assert.ok(await page.$('.empty'));
+  await page.waitForSelector('.empty');
   await page.close();
 });
 

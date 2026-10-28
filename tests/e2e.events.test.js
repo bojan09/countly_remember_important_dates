@@ -71,7 +71,7 @@ test('create → detail → persists across reload, with a live countdown', { sk
   // visible on Home
   await page.evaluate(() => (location.hash = '#/'));
   await page.waitForSelector('.home');
-  assert.ok((await titles(page, '.ecard-title')).some((x) => x.includes('Dentist')));
+  assert.ok((await titles(page, '.ecard-title, .hero-title')).some((x) => x.includes('Dentist')));
   assert.ok(id.startsWith('ev-'));
   assert.deepEqual(page.errors, []);
   await page.close();
@@ -161,7 +161,7 @@ test('delete asks for confirmation and Undo brings the event back', { skip, time
   await page.waitForSelector('.toast-action');
   await page.waitForSelector('.empty'); // home with no events
   await page.click('.toast-action');
-  await page.waitForFunction(() => [...document.querySelectorAll('.ecard-title')].some((e) => e.textContent.includes('Doomed')));
+  await page.waitForFunction(() => [...document.querySelectorAll('.ecard-title, .hero-title')].some((e) => e.textContent.includes('Doomed')));
   await page.close();
 });
 
@@ -183,7 +183,7 @@ test('duplicate, favorite and archive from the More sheet', { skip, timeout: 120
   await page.waitForFunction(() => /Archived/.test(document.querySelector('.d-sheet').textContent));
   await page.evaluate(() => (location.hash = '#/'));
   await page.waitForSelector('.home');
-  const names = await titles(page, '.ecard-title');
+  const names = await titles(page, '.ecard-title, .hero-title');
   assert.ok(names.some((n) => n.includes('Original') && !n.includes('copy')), 'original still listed');
   assert.ok(!names.some((n) => n.includes('(copy)')), 'archived copy hidden from lists');
   await page.evaluate(() => (location.hash = '#/timeline'));
@@ -253,6 +253,7 @@ test('search, sort, category and favorites filters on the timeline', { skip, tim
   assert.deepEqual((await list()).map((x) => x.trim()), ['Alpha review']);
   await page.click('.chip-toggle');
   await page.type('.tl-search input', 'ohrid'); // matches location
+  await page.waitForFunction(() => document.querySelectorAll('.tl-item').length === 1); // search is debounced
   assert.deepEqual(await list(), ['Beach week']);
   assert.match(await page.$eval('.tl-count', (e) => e.textContent), /1 event/);
   // favorites drive the hero on desktop
