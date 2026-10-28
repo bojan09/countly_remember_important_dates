@@ -1783,3 +1783,71 @@ a:hover .heat-cell {
     place-items: center;
   }
 }
+
+/* Long lists: show more + skip rendering off-screen rows */
+.more-host {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0 8px;
+}
+
+.tl-item,
+.mem-card,
+.cards > .ecard {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 96px;
+}
+
+.cards > .ecard {
+  contain-intrinsic-size: auto 150px;
+}
+
+/* Contrast: secondary text on the light event sheet, danger rows on dark dialogs */
+.d-sheet .muted,
+.d-sheet small.muted {
+  color: var(--paper-text-2);
+}
+
+:root[data-theme='dark'] .more-row.danger,
+:root[data-theme='dark'] .modal .row.danger {
+  color: #ff8fa3;
+}
+
+/* Windows high-contrast / forced colours: keep controls and state visible without custom colours */
+@media (forced-colors: active) {
+  .switch,
+  .cm-opt,
+  .ss-opt,
+  .rm-opt,
+  .bk-opt,
+  .theme-opt,
+  .accent-dot,
+  .ob-chip,
+  .btn,
+  .icon-btn,
+  .input {
+    border: 1px solid ButtonText;
+  }
+
+  .switch[aria-checked='true'],
+  .cm-opt[aria-checked='true'],
+  .ss-opt[aria-checked='true'],
+  .theme-opt[aria-checked='true'],
+  .accent-dot[aria-checked='true'],
+  .ob-chip[aria-checked='true'],
+  [aria-pressed='true'],
+  [aria-current='page'] {
+    outline: 3px solid Highlight;
+    outline-offset: 1px;
+  }
+
+  .meter i,
+  .bar-col i {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :focus-visible {
+    outline: 3px solid Highlight;
+  }
+}

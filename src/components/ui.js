@@ -147,12 +147,12 @@ export function confirmDialog({ title, body, confirmLabel, danger = false }) {
   });
 }
 
-export function emptyState({ iconName = 'sparkle', title, body, action }) {
+export function emptyState({ iconName = 'sparkle', title, body, action, level = 2 }) {
   return h(
     'div',
     { class: 'empty' },
     h('div', { class: 'empty-art', html: icon(iconName, { size: 34 }) }),
-    h('h2', { class: 'empty-title' }, title),
+    h(`h${level}`, { class: 'empty-title' }, title),
     body ? h('p', { class: 'empty-body' }, body) : null,
     action || null,
   );

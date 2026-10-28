@@ -4,9 +4,9 @@ import { pageHeader, mobilePageHead } from '../components/chrome.js';
 import { ACCENTS } from '../store/prefs.js';
 import { LANGS, t, getLang, formatDate } from '../i18n/index.js';
 import { runExport, pickAndImport } from './backupFlow.js';
+import { VERSION } from '../version.js';
 import { openNotificationSettings, exportAllToCalendar } from '../components/reminders.js';
 
-const SOON_ROWS = [];
 
 function formatBytes(n) {
   if (n < 1024) return `${n} B`;
@@ -83,9 +83,6 @@ export default function renderSettings(ctx) {
 
   // Rows
   const list = h('ul', { class: 'rows' });
-  for (const [key, ic] of SOON_ROWS) {
-    list.append(h('li', null, h('div', { class: 'row disabled', 'aria-disabled': 'true' }, h('span', { class: 'row-ico', html: icon(ic, { size: 22 }) }), h('span', { class: 'grow' }, t(`settings.${key}`)), h('span', { class: 'soon' }, t('settings.soon')))));
-  }
   const last = prefs.lastBackup ? t('backup.last', { date: formatDate(new Date(prefs.lastBackup).toISOString().slice(0, 10)) }) : t('backup.never');
   const dataRow = (ic, label, sub, onclick) => h('li', null, h('button', { type: 'button', class: 'row', onclick }, h('span', { class: 'row-ico', html: icon(ic, { size: 22 }) }), h('span', { class: 'grow' }, h('span', { class: 'row-title' }, label), sub ? h('small', { class: 'row-sub muted' }, sub) : null), h('span', { html: icon('chevronRight', { size: 20 }) })));
   list.append(
@@ -105,7 +102,7 @@ export default function renderSettings(ctx) {
 function showAbout() {
   openModal({
     title: t('about.title'),
-    content: [h('p', null, t('about.body')), h('p', { class: 'note' }, t('about.license')), h('p', { class: 'muted small' }, t('app.version', { version: '0.1.0' }))],
+    content: [h('p', null, t('about.body')), h('p', { class: 'note' }, t('about.license')), h('p', { class: 'muted small' }, t('app.version', { version: VERSION }))],
     actions: [{ label: t('actions.gotIt') }],
   });
 }

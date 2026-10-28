@@ -123,3 +123,8 @@ test('scenes render valid, self-contained SVG with unique gradient ids', async (
   const idsA = new Set([...a.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]));
   assert.ok([...b.matchAll(/ id="([^"]+)"/g)].every((m) => !idsA.has(m[1])), 'ids are unique across instances');
 });
+
+test('the version shown in About matches package.json', async () => {
+  const { VERSION } = await import('../src/version.js');
+  assert.equal(VERSION, JSON.parse(read(ROOT + 'package.json')).version);
+});

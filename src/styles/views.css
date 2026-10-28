@@ -183,10 +183,12 @@
   flex-direction: column;
   flex: 1;
   min-width: 0;
+  overflow-wrap: anywhere; /* a 80-character word must wrap, not widen the page */
 }
 
 .day-txt small {
-  color: var(--paper-text-2);
+  color: inherit; /* the row sits on paper in the day view and on dark in agenda: inherit what is readable there */
+  opacity: 0.78;
 }
 
 .chev {

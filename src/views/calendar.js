@@ -143,7 +143,7 @@ export default function renderCalendar(ctx) {
           const list = (index.get(iso) || []).sort(byTime);
           const day = parseISODate(iso).d;
           return h(
-            'section',
+            'div',
             { class: `wk-day${iso === today ? ' today' : ''}${iso === cursor ? ' selected' : ''}`, role: 'listitem', 'aria-label': formatDate(iso, { dateStyle: 'full' }) },
             h('button', { type: 'button', class: 'wk-head', onclick: () => { cursor = iso; mode = 'day'; root.querySelector('.cal-layout').className = 'cal-layout mode-day'; drawTabs(); draw(); }, 'aria-label': t('calendar.weekdayNumber', { weekday: formatDate(iso, { weekday: 'long' }), day }) }, h('span', { class: 'wk-name' }, name), h('b', { class: 'wk-num' }, String(day))),
             list.length

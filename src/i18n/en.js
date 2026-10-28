@@ -151,7 +151,6 @@ export default {
     occNotesLabel: 'Notes for this date',
     archivedBadge: 'Archived',
     repeatsLabel: 'Repeats',
-    soon: 'Reminders and sharing arrive in a later update.',
     photoType: 'Please choose a JPEG, PNG, WebP, GIF or AVIF image.',
     photoSize: 'That image is larger than 8 MB.',
     photoCount: 'You can add up to 12 photos per event.',
@@ -195,7 +194,6 @@ export default {
     weekdayNumber: '{weekday} {day}',
     eventsOn: 'Events on {date}',
     noEvents: 'No events on this day.',
-    comingWeek: 'Week and agenda views arrive in a later update.',
     gridLabel: '{month} calendar',
     hasEvents: '{count} events',
   },
@@ -256,7 +254,6 @@ export default {
     thisYear: 'This Year',
     summary: '{total} events across {categories} categories. Most common: {top}.',
     chartSummary: 'Events per month: {list}.',
-    soon: 'Category and calendar insights arrive with the analytics update.',
     sampleNote: 'Based on sample events.',
   },
   categories: {
@@ -379,7 +376,6 @@ export default {
     importData: 'Import Data',
     pwa: 'PWA / Offline',
     about: 'About Countly',
-    soon: 'Soon',
     general: 'General',
     data: 'Your data',
     accents: {
@@ -468,8 +464,6 @@ export default {
     editTitle: 'Edit Event',
     createdHelp: 'Saved on this device only. Nothing is uploaded.',
     title: 'Add New Event',
-    soonTitle: 'Event creation is next',
-    soonBody: 'Creating, editing and saving your own events arrives in the next phase. For now, explore Countly with the sample events.',
   },
   notify: {
     title: 'Notifications',
@@ -499,6 +493,9 @@ export default {
     copied: 'Text copied',
     saved: 'Image saved as {name}',
     failed: 'Could not share. Try downloading the image instead.',
+  },
+  list: {
+    showMore: 'Show more ({left} left)',
   },
   reminders: {
     title: 'Reminders',

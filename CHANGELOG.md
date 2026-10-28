@@ -1,5 +1,11 @@
 # Changelog
 
+## Phase 6 — Polish, performance and accessibility (0.6.0)
+- Lists render in chunks, only the visible Home layout is built, search is debounced: with 500 events Home 9.4 s → 0.2 s and Timeline 5.2 s → 0.27 s on a throttled CPU. `npm run perf` probe added.
+- axe-core audit on every route and dialog (4 theme/viewport combinations); fixed contrast, missing h1, unlabeled file input and an invalid role.
+- 200 % text size at 320 px verified; agenda overflow fixed; forced-colours styles; outdated "coming soon" copy removed; custom categories work in Timeline links; real version in About.
+- README, ARCHITECTURE rewritten; RELEASE_CHECKLIST (manual device passes) added. Service worker cache v13.
+
 ## Phase 5 — Reminders, calendar export and share images (0.5.0)
 - Per-event reminders with a bell inbox, unread dot and optional system notifications; honest limits documented in docs/REMINDERS.md.
 - .ics export (one event or all) with repeats, skips and alarms.

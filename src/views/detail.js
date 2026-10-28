@@ -28,7 +28,7 @@ export default function renderDetail(ctx, id) {
     return h(
       'div',
       { class: 'view detail' },
-      emptyState({ iconName: 'calendar', title: t('detail.notFound'), body: t('detail.notFoundBody'), action: h('a', { href: '#/', class: 'btn primary' }, t('nav.home')) }),
+      emptyState({ level: 1, iconName: 'calendar', title: t('detail.notFound'), body: t('detail.notFoundBody'), action: h('a', { href: '#/', class: 'btn primary' }, t('nav.home')) }),
     );
   }
   const mine = !!ev.userEvent;
@@ -177,7 +177,7 @@ export default function renderDetail(ctx, id) {
       mine ? action('pencil', t('actions.edit'), { onclick: () => ctx.navigate(editHref) }) : action('copy', t('actions.makeCopy'), { onclick: doDuplicate }),
       action('more', t('actions.more'), { onclick: openMore, 'aria-haspopup': 'dialog' }),
     ),
-    h('p', { class: 'd-soon' }, ev.sample ? t('detail.sampleReadOnly') : t('detail.soon')),
+    ev.sample ? h('p', { class: 'd-soon' }, t('detail.sampleReadOnly')) : null,
     milestoneSection(ev, ctx.today),
     h('section', { class: 'd-notes' }, h('h2', null, t('detail.notes')), h('p', null, notes || t('detail.noNotes'))),
     mine && ev.date <= ctx.today ? reflectionSection(ev) : null,
@@ -198,7 +198,7 @@ function photoSection(ev) {
   liveUrls = [];
   const urls = liveUrls;
   const metas = listPhotos(ev.seriesId);
-  const input = h('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp,image/gif,image/avif', class: 'sr-only', id: 'photo-input', tabindex: '-1' });
+  const input = h('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp,image/gif,image/avif', class: 'sr-only', id: 'photo-input', tabindex: '-1', 'aria-label': t('actions.addPhoto') });
   const thumbs = h('div', { class: 'd-thumbs' });
 
   input.addEventListener('change', async () => {

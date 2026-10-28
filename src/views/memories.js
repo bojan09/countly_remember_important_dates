@@ -8,6 +8,7 @@ import { t, formatDate, formatNumber } from '../i18n/index.js';
 import { eventTitle } from '../store/demo.js';
 import { listPhotos, getPhotoBlob } from '../store/events.js';
 import { daysLabel } from '../components/eventCard.js';
+import { chunked } from '../components/chunked.js';
 
 // View state survives store/language re-renders within the session.
 let filter = 'all';
@@ -97,15 +98,28 @@ export default function renderMemories(ctx) {
       host.replaceChildren(emptyState({ iconName: 'memories', title: t(`memories.empty.${filter}Title`), body: t(`memories.empty.${filter}Body`) }));
       return;
     }
-    const groups = new Map();
-    for (const e of items) {
-      const y = parseISODate(e.date).y;
-      if (!groups.has(y)) groups.set(y, []);
-      groups.get(y).push(e);
-    }
-    host.replaceChildren(
-      ...[...groups].map(([year, list]) => h('section', { class: 'mem-year', 'aria-labelledby': `my-${year}` }, h('h2', { id: `my-${year}`, class: 'mem-year-h' }, String(year)), h('ul', { class: 'mem-grid' }, list.map(card)))),
-    );
+    // Year sections are created as the first card of each year is placed, so a long history is built a chunk at a time.
+    const lists = new Map();
+    const more = h('div', { class: 'more-host' });
+    const years = h('div');
+    host.replaceChildren(years, more);
+    chunked({
+      list: years,
+      footer: more,
+      items,
+      size: 24,
+      render: card,
+      place: (node, e) => {
+        const y = parseISODate(e.date).y;
+        let ul = lists.get(y);
+        if (!ul) {
+          ul = h('ul', { class: 'mem-grid' });
+          lists.set(y, ul);
+          years.append(h('section', { class: 'mem-year', 'aria-labelledby': `my-${y}` }, h('h2', { id: `my-${y}`, class: 'mem-year-h' }, String(y)), ul));
+        }
+        ul.append(node);
+      },
+    });
   }
 
   drawTabs();

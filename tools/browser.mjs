@@ -55,7 +55,7 @@ export async function launch() {
 }
 
 /** New page with preset prefs; collects console errors/page errors into page.errors. */
-export async function openPage(ctx, { viewport = VIEWPORTS['desktop-1440'], prefs = {}, route = '#/', colorScheme = 'dark' } = {}) {
+export async function openPage(ctx, { viewport = VIEWPORTS['desktop-1440'], prefs = {}, route = '#/', colorScheme = 'dark', bypassCsp = false } = {}) {
   const page = await ctx.newPage();
   page.errors = [];
   page.on('pageerror', (e) => page.errors.push(String(e)));
@@ -72,6 +72,7 @@ export async function openPage(ctx, { viewport = VIEWPORTS['desktop-1440'], pref
       /* ignore */
     }
   }, merged);
+  if (bypassCsp) await page.setBypassCSP(true); // lets tests inject axe-core; the shipped CSP is checked in project.test.js
   await page.goto(`${ctx.base}/${route}`, { waitUntil: 'networkidle0' });
   await page.waitForSelector('.view', { timeout: 8000 });
   return page;

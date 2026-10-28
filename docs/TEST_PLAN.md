@@ -16,6 +16,9 @@ Run: `npm test` (Node 20+; browser tests use Edge or Chrome via puppeteer-core, 
 | Milestones | tests/milestones.test.js, tests/e2e.milestones.test.js | marker dates and states, creation/start floor, leap days, yearly series, switch default/migration/backup, EN/MK labels; event page, Home hero, form switch, past events, MK phone |
 | Reminders + calendar | tests/reminders.test.js, tests/e2e.reminders.test.js | option rules, fire times incl. DST, due windows, .ics folding/escaping/recurrence/alarms; bell inbox, system notification stub, dialog, form, settings export, MK phone |
 | Share studio | tests/share.test.js, tests/e2e.share.test.js | wrap/ellipsis, theme contrast, crop maths, file names; real canvas sizes, switches, PNG download, long titles vs footer, MK phone |
+| Accessibility | tests/e2e.a11y.test.js | axe-core WCAG 2.1 A/AA + best practices on every route, calendar mode, stats tab, nav menu and dialog; dark/light x phone/desktop |
+| Polish | tests/e2e.polish.test.js | 200% text and 80-char unbroken titles at 320px (EN, MK) with no sideways scroll; focus returns after dialogs; distinct page titles; landmarks and h1 |
+| Performance | tests/e2e.perf.test.js, tools/perf.mjs | 5000-event derivation and cache, cold-start budget (FCP, CLS, bytes, requests), 400-event route renders, chunked lists and focus |
 | Model + store | tests/store.test.js | validation codes, schema-0 migration, hostile input clamping, CRUD with injected storage, reload persistence, undo, photos limits, archive, recurring derivation, skip/override, corrupted records, subscriptions |
 | Phase 2 browser E2E | tests/e2e.events.test.js | real IndexedDB: create/edit/delete+undo/duplicate/archive/favorite, validation a11y, recurrence + memories, timed/zoned countdown with ticking seconds, search/sort/filter, photos, offline restart, cross-tab sync, legacy/corrupt records, sample copy, EN/MK form at 5 viewports, keyboard-only submit |
 | Phase 2.1 browser E2E | tests/e2e.nav.test.js | top nav on desktop/tablet and bottom nav on mobile, dropdown keyboard/ARIA/outside-click behaviour, active section marking, preferences menu, Month/Week/Day/Agenda views incl. recurring occurrences, week/day/agenda at 5 viewports in EN and MK, density checks (14px base, hero height, two cards per phone screen) |
@@ -26,5 +29,5 @@ Run: `npm test` (Node 20+; browser tests use Edge or Chrome via puppeteer-core, 
 - No real-device testing (iOS Safari, Android Chrome); emulated viewports in headless Edge only.
 - Install prompt and "installed" state depend on browser UI and were not exercised.
 - No screen-reader session (VoiceOver/NVDA); accessible names, landmarks and focus are asserted programmatically only.
-- Performance budgets are not yet measured (Phase 6).
+- Performance is measured in headless Chromium with simulated CPU throttling only; see docs/RELEASE_CHECKLIST.md for the real-device passes.
 - Visual fidelity is judged by eye against the reference, not pixel-diffed.

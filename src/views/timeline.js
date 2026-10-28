@@ -3,11 +3,12 @@ import { icon } from '../components/icons.js';
 import { pageHeader, mobilePageHead } from '../components/chrome.js';
 import { sceneSvg } from '../scenes/art.js';
 import { upcoming, past, byDateAsc, byDateDesc } from '../events/select.js';
-import { categoryById, categoryName, visibleCategories } from '../events/categories.js';
+import { categoryById, categoryName, visibleCategories, isKnownCategory } from '../events/categories.js';
 import { t, formatDate } from '../i18n/index.js';
 import { eventTitle } from '../store/demo.js';
 import { getArchived } from '../store/events.js';
 import { daysLabel } from '../components/eventCard.js';
+import { chunked } from '../components/chunked.js';
 
 // View state survives re-renders (language switch, store updates) within the session.
 const state = { filter: 'all', sort: 'default', cat: 'all', fav: false };
@@ -24,16 +25,19 @@ export default function renderTimeline(ctx) {
   const f = ctx.query.get('f');
   if (['all', 'upcoming', 'past', 'archived'].includes(f)) state.filter = f;
   const cat = ctx.query.get('cat');
-  if (cat && ['celebration', 'travel', 'work', 'health', 'personal', 'other'].includes(cat)) state.cat = cat;
+  if (cat && isKnownCategory(cat)) state.cat = cat;
   let query = (ctx.query.get('q') || '').trim();
 
   const list = h('ol', { class: 'tl' });
+  const more = h('div', { class: 'more-host' });
+  let searchTimer = null;
   const tabsHost = h('div');
   const count = h('p', { class: 'tl-count muted small', 'aria-live': 'polite' });
   const input = h('input', { type: 'search', class: 'input', placeholder: t('timeline.searchPlaceholder'), 'aria-label': t('timeline.searchPlaceholder'), value: query, autocomplete: 'off' });
   input.addEventListener('input', () => {
     query = input.value.trim();
-    drawList();
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(drawList, 120); // typing should not rebuild the whole list per keystroke
   });
 
   const option = (v, label) => h('option', { value: v }, label);
@@ -94,6 +98,7 @@ export default function renderTimeline(ctx) {
     h('div', { class: 'tl-filters', role: 'group', 'aria-label': t('timeline.filters') }, sortEl, catEl, favBtn, clearBtn),
     count,
     list,
+    more,
   );
 
   function source() {
@@ -138,11 +143,15 @@ export default function renderTimeline(ctx) {
     count.textContent = t('timeline.resultCount', { count: rows.length });
     if (!rows.length) {
       const archivedTab = state.filter === 'archived';
+      more.replaceChildren();
       list.replaceChildren(h('li', null, emptyState({ iconName: 'timeline', title: archivedTab && !filtered ? t('timeline.archivedEmpty') : events.length || filtered ? t('timeline.noResults') : t('timeline.empty') })));
       return;
     }
-    list.replaceChildren(
-      ...rows.map((e) => {
+    chunked({
+      list,
+      footer: more,
+      items: rows,
+      render: (e) => {
         const cat = categoryById(e.category);
         return h(
           'li',
@@ -162,8 +171,8 @@ export default function renderTimeline(ctx) {
             h('span', { class: 'chev', 'aria-hidden': 'true', html: icon('chevronRight', { size: 20 }) }),
           ),
         );
-      }),
-    );
+      },
+    });
   }
   drawTabs();
   drawList();

@@ -12,6 +12,7 @@ import { milestoneLabel } from '../components/milestone.js';
 import { t, getLang, greetingKey, formatDate, formatNumber, formatDays, unit } from '../i18n/index.js';
 import { eventTitle } from '../store/demo.js';
 import { logoMark } from '../components/logo.js';
+import { chunked } from '../components/chunked.js';
 
 let tab = 'upcoming'; // remembered across renders
 
@@ -36,7 +37,24 @@ export default function renderHome(ctx) {
     return root;
   }
 
-  root.append(desktop(ctx, { up, month, pst }), mobile(ctx, { up, month, pst }));
+  // Only the layout that is on screen is built; the other is built if the window crosses the breakpoint.
+  const phone = typeof matchMedia === 'function' ? matchMedia('(max-width: 767px)') : { matches: false };
+  const data = { up, month, pst };
+  const desk = h('div', { class: 'only-desktop' });
+  const mob = h('div', { class: 'only-mobile m-home' });
+  const built = { desk: false, mob: false };
+  const build = () => {
+    if (phone.matches && !built.mob) {
+      built.mob = true;
+      fillMobile(mob, ctx, data);
+    } else if (!phone.matches && !built.desk) {
+      built.desk = true;
+      fillDesktop(desk, ctx, data);
+    }
+  };
+  build();
+  if (phone.addEventListener) phone.addEventListener('change', build);
+  root.append(desk, mob);
   return root;
 }
 
@@ -63,10 +81,9 @@ function kpi(iconName, color, num, label) {
   );
 }
 
-function desktop(ctx, { up, month, pst }) {
+function fillDesktop(wrap, ctx, { up, month, pst }) {
   const { today, prefs } = ctx;
   const next = featuredEvent(ctx.events, today);
-  const wrap = h('div', { class: 'only-desktop' });
   wrap.append(
     pageHeader(ctx, { title: greeting(prefs), sub: `${t('greeting.sub')} ✨` }),
     ...(prefs.showSamples ? [sampleBanner(ctx)] : []),
@@ -92,7 +109,6 @@ function desktop(ctx, { up, month, pst }) {
       h('div', { class: 'tiles' }, rest.map((e) => eventCard(e, today, { variant: 'tile' }))),
     );
   }
-  return wrap;
 }
 
 function hero(ev, today) {
@@ -116,8 +132,8 @@ function hero(ev, today) {
   );
 }
 
-function mobile(ctx, { up, month, pst }) {
-  const wrap = h('div', { class: 'only-mobile m-home' });
+function fillMobile(wrap, ctx, { up, month, pst }) {
+  wrap.append(h('h1', { class: 'sr-only' }, t('nav.home')));
   const lists = { upcoming: up, thisMonth: month, past: pst };
   const empty = { upcoming: 'home.noUpcoming', thisMonth: 'home.noThisMonth', past: 'home.noPast' };
 
@@ -129,6 +145,7 @@ function mobile(ctx, { up, month, pst }) {
   );
 
   const list = h('div', { class: 'cards', role: 'tabpanel', id: 'home-panel' });
+  const more = h('div', { class: 'more-host' });
   const tabs = h('div', { class: 'm-tabs' });
 
   function draw() {
@@ -148,9 +165,12 @@ function mobile(ctx, { up, month, pst }) {
       }),
     );
     const items = lists[tab];
-    list.replaceChildren(...(items.length ? items.map((e) => eventCard(e, ctx.today, { variant: 'wide' })) : [emptyState({ iconName: 'calendar', title: t(empty[tab]) })]));
+    if (items.length) chunked({ list, footer: more, items, render: (e) => eventCard(e, ctx.today, { variant: 'wide' }) });
+    else {
+      more.replaceChildren();
+      list.replaceChildren(emptyState({ iconName: 'calendar', title: t(empty[tab]) }));
+    }
   }
   draw();
-  wrap.append(header, tabs, ...(ctx.prefs.showSamples ? [sampleBanner(ctx)] : []), list);
-  return wrap;
+  wrap.append(header, tabs, ...(ctx.prefs.showSamples ? [sampleBanner(ctx)] : []), list, more);
 }
