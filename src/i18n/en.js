@@ -389,6 +389,10 @@ export default {
     },
   },
   backup: {
+    nudgeTitle: 'Back up your events.',
+    nudgeNever: 'They live only on this device and have never been backed up.',
+    nudgeStale: 'Your last backup is more than a month old.',
+    nudgeLater: 'Remind me later',
     exportDone: 'Backup saved. Events: {events} · Photos: {photos}',
     exportFailed: 'Could not create the backup. Please try again.',
     last: 'Last backup: {date}',

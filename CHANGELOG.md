@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1 — Local-only decision
+- Product decision recorded: no backend or sync; backup files are the cross-device path.
+- Home shows a dismissible "Back up your events" reminder (3+ own events, no backup in 30 days, snooze 14 days). Service worker cache v14.
+
 ## Phase 6 — Polish, performance and accessibility (0.6.0)
 - Lists render in chunks, only the visible Home layout is built, search is debounced: with 500 events Home 9.4 s → 0.2 s and Timeline 5.2 s → 0.27 s on a throttled CPU. `npm run perf` probe added.
 - axe-core audit on every route and dialog (4 theme/viewport combinations); fixed contrast, missing h1, unlabeled file input and an invalid role.

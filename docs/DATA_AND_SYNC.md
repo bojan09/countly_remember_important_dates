@@ -1,5 +1,11 @@
 # Where data lives, and how multiple devices could share it
 
+> **Decision (product owner): local-only.** Countly stays server-free: no accounts, no cloud database, no sync. Data lives on the device; the **backup file** (Settings → Export / Import Data) is the way to move or protect it. Consequences, accepted:
+> - Each device has its own copy; moving to a new phone means export → import.
+> - Clearing site data or uninstalling deletes events. Mitigations built: persistent-storage request, a Home reminder to back up (shown with 3+ events and no backup in 30 days, snoozable 14 days), a safety backup before any "Replace" import.
+> - Reminders only fire while the app is open; the `.ics` calendar export is the dependable alternative ([REMINDERS.md](REMINDERS.md)).
+> - The backup format (`version`, per-event `updatedAt`) is kept stable so sync can be added later without migrating user data. The rest of this page is the analysis behind the decision and stays valid if it is revisited.
+
 ## Today (Phase 2.1): local-first, no server
 
 - All events, preferences and photos are stored **on the device, in the browser's IndexedDB** (events, photos as Blobs) plus a few UI flags in localStorage. It is a real database built into every browser: no install, no account, works offline, nothing is uploaded.

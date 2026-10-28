@@ -1851,3 +1851,9 @@ a:hover .heat-cell {
     outline: 3px solid Highlight;
   }
 }
+
+.banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

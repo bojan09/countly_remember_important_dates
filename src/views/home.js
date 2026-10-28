@@ -13,6 +13,9 @@ import { t, getLang, greetingKey, formatDate, formatNumber, formatDays, unit } f
 import { eventTitle } from '../store/demo.js';
 import { logoMark } from '../components/logo.js';
 import { chunked } from '../components/chunked.js';
+import { needsBackup, BACKUP_NUDGE } from '../store/backup.js';
+import { userEventCount } from '../store/events.js';
+import { runExport } from './backupFlow.js';
 
 let tab = 'upcoming'; // remembered across renders
 
@@ -63,6 +66,16 @@ function greeting(prefs) {
   return prefs.name ? t('greeting.withName', { greeting: g, name: prefs.name }) : t('greeting.plain', { greeting: g });
 }
 
+function backupBanner(ctx) {
+  if (!needsBackup({ eventCount: userEventCount(), lastBackup: ctx.prefs.lastBackup, snoozedUntil: ctx.prefs.backupSnoozedUntil })) return null;
+  return h(
+    'div',
+    { class: 'banner backup-banner', role: 'note' },
+    h('span', null, h('b', null, t('backup.nudgeTitle')), ' ', ctx.prefs.lastBackup ? t('backup.nudgeStale') : t('backup.nudgeNever')),
+    h('span', { class: 'banner-actions' }, h('button', { type: 'button', class: 'btn secondary', onclick: () => runExport(ctx) }, t('settings.exportData')), h('button', { type: 'button', class: 'btn secondary', onclick: () => ctx.setPref('backupSnoozedUntil', Date.now() + BACKUP_NUDGE.snoozeDays * 86400000) }, t('backup.nudgeLater'))),
+  );
+}
+
 function sampleBanner(ctx) {
   return h(
     'div',
@@ -86,6 +99,7 @@ function fillDesktop(wrap, ctx, { up, month, pst }) {
   const next = featuredEvent(ctx.events, today);
   wrap.append(
     pageHeader(ctx, { title: greeting(prefs), sub: `${t('greeting.sub')} ✨` }),
+    backupBanner(ctx),
     ...(prefs.showSamples ? [sampleBanner(ctx)] : []),
     h(
       'div',
@@ -172,5 +186,5 @@ function fillMobile(wrap, ctx, { up, month, pst }) {
     }
   }
   draw();
-  wrap.append(header, tabs, ...(ctx.prefs.showSamples ? [sampleBanner(ctx)] : []), list, more);
+  wrap.append(header, tabs, backupBanner(ctx), ...(ctx.prefs.showSamples ? [sampleBanner(ctx)] : []), list, more);
 }

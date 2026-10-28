@@ -127,3 +127,28 @@ test('import dialog works in Macedonian, on mobile, with keyboard focus inside t
   assert.ok(m.sw <= m.iw, JSON.stringify(m));
   await page.close();
 });
+
+test('Home nudges to back up after a few events, "later" snoozes it and an export clears it', { skip, timeout: 90000 }, async () => {
+  const page = await openPage(ctx, { viewport: VIEWPORTS['desktop-1440'], prefs: { showSamples: false }, route: '#/settings' });
+  for (const n of [1, 2]) await seed(page, `Event ${n}`);
+  await page.evaluate(() => (location.hash = '#/'));
+  await page.waitForSelector('.view.home');
+  assert.equal(await page.$('.backup-banner'), null, 'two events: no nudge');
+  await seed(page, 'Event 3');
+  await page.waitForSelector('.backup-banner');
+  assert.match(await page.$eval('.backup-banner', (e) => e.textContent), /Back up your events\..*never been backed up/);
+  await page.evaluate(() => [...document.querySelectorAll('.backup-banner .btn')].find((b) => /later/.test(b.textContent)).click());
+  await page.waitForFunction(() => !document.querySelector('.backup-banner'));
+  await page.reload({ waitUntil: 'networkidle0' });
+  await page.waitForSelector('.view.home');
+  assert.equal(await page.$('.backup-banner'), null, 'snooze survives a reload');
+  await page.evaluate(async () => (await import('/src/store/prefs.js')).setPref('backupSnoozedUntil', null));
+  await page.evaluate(() => (location.hash = '#/settings'));
+  await page.waitForSelector('.rows .row');
+  await clickRow(page, 'Export');
+  await page.waitForFunction(() => /Backup saved/.test(document.querySelector('.toast-host')?.textContent || ''));
+  await page.evaluate(() => (location.hash = '#/'));
+  await page.waitForSelector('.view.home');
+  assert.equal(await page.$('.backup-banner'), null, 'a fresh backup clears the nudge');
+  await page.close();
+});

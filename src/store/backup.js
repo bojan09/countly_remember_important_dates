@@ -164,3 +164,16 @@ export function planImport(parsed, existing, existingPhotos, mode = 'merge', { m
   const catWrites = cats.filter((c) => !existingCategories.has(c.id) || c.updatedAt > existingCategories.get(c.id).updatedAt);
   return { mode, categories: catWrites, removeCategories: [], add, update, unchanged, photos, remove: [] };
 }
+
+export const BACKUP_NUDGE = { minEvents: 3, staleDays: 30, snoozeDays: 14 };
+
+/**
+ * Local-only storage means clearing site data loses everything, so Home offers a gentle reminder:
+ * once there are a few events of your own and no backup in the last 30 days (or ever).
+ * `eventCount` counts your own events, not samples.
+ */
+export function needsBackup({ eventCount, lastBackup, snoozedUntil, now = Date.now() }) {
+  if (eventCount < BACKUP_NUDGE.minEvents) return false;
+  if (snoozedUntil && snoozedUntil > now) return false;
+  return !lastBackup || now - lastBackup > BACKUP_NUDGE.staleDays * 86400000;
+}

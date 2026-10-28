@@ -147,3 +147,15 @@ test('backup: planImport merge respects the per-event photo cap and skips known 
   assert.deepEqual(plan.photos.map((p) => p.id), ['ph-b']);
   assert.equal(plan.unchanged, 1);
 });
+
+test('backup nudge: only for people with a few events and no recent backup, and it can be snoozed', async () => {
+  const { needsBackup } = await import('../src/store/backup.js');
+  const now = Date.UTC(2026, 10, 1);
+  const day = 86400000;
+  assert.equal(needsBackup({ eventCount: 2, lastBackup: null, now }), false, 'too few events');
+  assert.equal(needsBackup({ eventCount: 3, lastBackup: null, now }), true, 'never backed up');
+  assert.equal(needsBackup({ eventCount: 9, lastBackup: now - 29 * day, now }), false, 'recent backup');
+  assert.equal(needsBackup({ eventCount: 9, lastBackup: now - 31 * day, now }), true, 'stale backup');
+  assert.equal(needsBackup({ eventCount: 9, lastBackup: null, snoozedUntil: now + day, now }), false, 'snoozed');
+  assert.equal(needsBackup({ eventCount: 9, lastBackup: null, snoozedUntil: now - day, now }), true, 'snooze expired');
+});

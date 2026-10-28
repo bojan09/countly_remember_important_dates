@@ -5,7 +5,7 @@ Plain **HTML + CSS + vanilla JavaScript (ES modules)**: no framework, no build s
 English and Macedonian (Cyrillic) are both first-class.
 
 > **Status: Phase 6 of 6 (polish, performance, accessibility)** — see [CHANGELOG.md](CHANGELOG.md) and [docs/PHASE_6_REPORT.md](docs/PHASE_6_REPORT.md).
-> Everything is stored on the device. Sync across devices is a separate, later decision ([docs/DATA_AND_SYNC.md](docs/DATA_AND_SYNC.md)).
+> Everything is stored on the device. Decision: local-only, no accounts or sync; move data with backup files ([docs/DATA_AND_SYNC.md](docs/DATA_AND_SYNC.md)).
 
 ## Run it
 
@@ -34,7 +34,7 @@ Any static file host works (GitHub Pages, Netlify, Vercel, Cloudflare Pages): se
 
 ## Privacy and limits
 
-Everything stays on the device (IndexedDB for events/photos, localStorage for preferences). There are no network requests other than loading the app itself. Clearing site data deletes your events: use **Settings → Export Data** regularly. A web app cannot wake a closed browser, so reminders only fire while Countly is open; see [docs/REMINDERS.md](docs/REMINDERS.md).
+Everything stays on the device (IndexedDB for events/photos, localStorage for preferences); the product decision is **local-only, no sync** ([docs/DATA_AND_SYNC.md](docs/DATA_AND_SYNC.md)). There are no network requests other than loading the app itself. Clearing site data deletes your events: use **Settings → Export Data** regularly. A web app cannot wake a closed browser, so reminders only fire while Countly is open; see [docs/REMINDERS.md](docs/REMINDERS.md).
 
 ## Layout
 
